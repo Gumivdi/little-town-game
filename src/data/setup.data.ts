@@ -1,4 +1,4 @@
-import { TSetup } from "shared/types/setup.type";
+import { TSetup } from "@/shared/types/setup.type";
 
 const TWO_PLAYERS: TSetup = {
   workers: 5,

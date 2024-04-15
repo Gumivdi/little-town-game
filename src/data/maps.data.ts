@@ -1,4 +1,4 @@
-import { TMap } from "shared/types/map.type";
+import { TMap } from "@/shared/types/map.type";
 import { FORREST, GRASS, ROCKS, POND } from "./fields.data";
 
 const F = FORREST;

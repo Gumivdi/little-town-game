@@ -1,6 +1,6 @@
-import { EBuildings } from "shared/enums/buildings.enum";
+import { EBuildings } from "@/shared/enums/buildings.enum";
+import { EStage } from "@/shared/enums/stage.enum";
 import { TResourcesAll } from "./resources.type";
-import { EStage } from "shared/enums/stage.enum";
 
 type TBuildingAction = {
   require?: Partial<TResourcesAll>;
