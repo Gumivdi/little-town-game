@@ -1,4 +1,4 @@
-import { TPlayer } from "shared/types/player.type";
+import { TPlayer } from "@/shared/types/player.type";
 
 export const DPlayers: TPlayer[] = [
   {

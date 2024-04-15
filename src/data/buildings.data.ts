@@ -1,6 +1,6 @@
-import { EBuildings } from "shared/enums/buildings.enum";
-import { EStage } from "shared/enums/stage.enum";
-import { TBuilding } from "shared/types/building.type";
+import { EBuildings } from "@/shared/enums/buildings.enum";
+import { EStage } from "@/shared/enums/stage.enum";
+import { TBuilding } from "@/shared/types/building.type";
 
 export const DBuildingsRecommended: EBuildings[] = [
   EBuildings.WORKSHOP,

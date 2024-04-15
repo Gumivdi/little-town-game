@@ -1,4 +1,4 @@
-import { ETerrains } from "shared/enums/terrains.enum";
+import { ETerrains } from "@/shared/enums/terrains.enum";
 import { TBuilding } from "./building.type";
 
 export type TLandscapeArea = {
