@@ -2,7 +2,7 @@ import { EBuildings } from "@/shared/enums/buildings.enum";
 import { EStage } from "@/shared/enums/stage.enum";
 import { TBuilding } from "@/shared/types/building.type";
 
-export const DBuildingsRecommended: EBuildings[] = [
+export const DBuildingsRecommended = [
   EBuildings.WORKSHOP,
   EBuildings.BAKERY,
   EBuildings.QUARRY,
@@ -15,6 +15,15 @@ export const DBuildingsRecommended: EBuildings[] = [
   EBuildings.WELL,
   EBuildings.STATUE,
   EBuildings.CASTLE,
+];
+
+export const DSpecialBuildings = [
+  EBuildings.CASTLE,
+  EBuildings.CATHEDRAL,
+  EBuildings.LOMBARD,
+  EBuildings.CASTLE,
+  EBuildings.RESIDENCE,
+  EBuildings.WATCHTOWER,
 ];
 
 export const DBuildings: TBuilding[] = [
