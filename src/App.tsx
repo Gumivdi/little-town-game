@@ -1,10 +1,11 @@
 import Map from "@/components/Map/Map";
+import BuildingsStore from "./components/BuildingsStore";
 
 function App() {
   const classes = {
     main: "grid",
-    sidebar: "col-start-1 col-end-4",
-    map: "col-start-4 col-end-12",
+    sidebar: "grid grid-cols-2 gap-2 p-3 max-h-svh overflow-auto",
+    map: "col-start-2 col-end-12",
   };
 
   return (
@@ -14,7 +15,9 @@ function App() {
         style={{
           background: "repeating-linear-gradient(0deg, #512600, #1e1804 2rem)",
         }}
-      ></section>
+      >
+        <BuildingsStore />
+      </section>
       <Map className={classes.map} />
     </main>
   );
