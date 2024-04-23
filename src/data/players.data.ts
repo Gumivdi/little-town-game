@@ -1,9 +1,11 @@
+import { EColors } from "@/shared/enums/colors.enum";
 import { TPlayer } from "@/shared/types/player.type";
 
 export const DPlayers: TPlayer[] = [
   {
     id: 1,
     name: "Gimmy",
+    color: EColors.RED,
     workers: 0,
     buildings: 0,
     resources: {
@@ -18,6 +20,7 @@ export const DPlayers: TPlayer[] = [
   {
     id: 2,
     name: "Kate",
+    color: EColors.PURPLE,
     workers: 0,
     buildings: 0,
     resources: {
