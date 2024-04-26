@@ -1,29 +1,26 @@
 import { Fragment } from "react/jsx-runtime";
 
-import { EResources } from "@/shared/enums/resources.enum";
-import { TResourcesAll } from "@/shared/types/resources.type";
-
-type TProps = {
+type TProps<T> = {
   uniqueKey: string;
-  object: Partial<TResourcesAll>;
-  fallback: (resource: EResources) => JSX.Element;
+  object: Partial<T>;
+  fallback: (resource: keyof T) => JSX.Element;
 };
 
-const ResourceMapObject: React.FC<TProps> = ({
-  uniqueKey,
-  object,
-  fallback,
-}) => (
-  <>
-    {Object.keys(object).map((itemKey, index) => {
-      const resourceKey = itemKey as EResources;
-      const uniqueKeyModified = uniqueKey.concat(`-${resourceKey}-${index}`);
+function ResourceMapObject<T>({ uniqueKey, object, fallback }: TProps<T>) {
+  return (
+    <>
+      {Object.keys(object).map((itemKey, index) => {
+        const resourceKey = itemKey as keyof T;
+        const uniqueKeyModified = uniqueKey.concat(
+          `-${String(resourceKey)}-${index}`
+        );
 
-      return (
-        <Fragment key={uniqueKeyModified}>{fallback(resourceKey)}</Fragment>
-      );
-    })}
-  </>
-);
+        return (
+          <Fragment key={uniqueKeyModified}>{fallback(resourceKey)}</Fragment>
+        );
+      })}
+    </>
+  );
+}
 
 export default ResourceMapObject;

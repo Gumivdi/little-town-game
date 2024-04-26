@@ -1,6 +1,7 @@
 import Map from "@/components/Map/Map";
 import BuildingsStore from "@/components/BuildingsStore";
 import Players from "@/components/Players";
+import Supply from "@/components/Supply";
 
 function App() {
   const classes = {
@@ -18,6 +19,7 @@ function App() {
           background: "repeating-linear-gradient(0deg, #512600, #1e1804 2rem)",
         }}
       >
+        <Supply />
         <Players />
         <div className={classes.store}>
           <BuildingsStore />
