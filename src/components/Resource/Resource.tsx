@@ -17,7 +17,7 @@ const Resource: React.FC<TProps> = ({ type, size, children, ...args }) => {
   };
 
   const roundedResources = [EResources.COIN, EResources.POINT];
-  let elementClass = `size-${size} flex justify-center align-center shadow-[0_0_1px_1px_black] `;
+  let elementClass = `size-${size} flex items-center justify-center shadow-[0_0_1px_1px_black] `;
   elementClass += resources[type];
 
   return (
