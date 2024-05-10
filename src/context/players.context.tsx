@@ -8,6 +8,7 @@ import {
 } from "react";
 import { TPlayer } from "@/shared/types/player.type";
 import { TResourcesAll } from "@/shared/types/resources.type";
+import { calculateResources } from "@/shared/helpers/calculateResources";
 
 type TContext = {
   currentPlayer: number;
@@ -60,22 +61,6 @@ const reducer: Reducer<TReducer, TReducerActions> = (
     },
   });
 
-  const updateResources = (
-    player: TPlayer,
-    resources: Partial<TResourcesAll>,
-    operation: (a: number, b: number) => number
-  ) => {
-    const playerResources = { ...player.resources };
-    for (const key in resources) {
-      const typedKey = key as keyof TResourcesAll;
-      playerResources[typedKey] = operation(
-        playerResources[typedKey]!,
-        resources[typedKey]!
-      );
-    }
-    return playerResources;
-  };
-
   switch (type) {
     case "INIT": {
       return {
@@ -105,7 +90,7 @@ const reducer: Reducer<TReducer, TReducerActions> = (
       players[playerIndex] = {
         ...player,
         resources: {
-          ...updateResources(player, resources, (a, b) => a - b),
+          ...calculateResources(player.resources, resources, (a, b) => a - b),
         },
       };
 
@@ -124,7 +109,7 @@ const reducer: Reducer<TReducer, TReducerActions> = (
       players[playerIndex] = {
         ...player,
         resources: {
-          ...updateResources(player, resources, (a, b) => a + b),
+          ...calculateResources(player.resources, resources, (a, b) => a + b),
         },
       };
 
