@@ -1,5 +1,6 @@
 import { FC, ReactNode, Reducer, createContext, useReducer } from "react";
 import { TResourcesOnly } from "@/shared/types/resources.type";
+import { calculateResources } from "@/shared/helpers/calculateResources";
 
 type TContext = {
   supply: TResourcesOnly;
@@ -29,31 +30,15 @@ const reducer: Reducer<TResourcesOnly, TReducerActions> = (
 ): TResourcesOnly => {
   const { type, payload } = action;
 
-  const updateSupply = (
-    resources: Partial<TResourcesOnly>,
-    operation: (a: number, b: number) => number
-  ) => {
-    const updatedSupply = Object.assign({}, { ...state });
-
-    for (const key in resources) {
-      const typedKey = key as keyof TResourcesOnly;
-      updatedSupply[typedKey] = operation(
-        updatedSupply[typedKey],
-        resources[typedKey]!
-      );
-    }
-    return updatedSupply;
-  };
-
   switch (type) {
     case "TAKE":
       return {
-        ...updateSupply(payload, (a, b) => a - b),
+        ...calculateResources(state, payload, (a, b) => a - b),
       };
 
     case "RESTORE":
       return {
-        ...updateSupply(payload, (a, b) => a + b),
+        ...calculateResources(state, payload, (a, b) => a + b),
       };
 
     default:

@@ -15,6 +15,7 @@ export default {
         "border-orange-600",
         "border-gray-600",
         "size-6",
+        "size-8",
       ],
     }),
   ],
