@@ -2,6 +2,7 @@ import BuildingsStore from "@/components/BuildingsStore";
 import Players from "@/components/Players";
 import Supply from "@/components/Supply";
 import DevelopmentActions from "@/components/DevelopmentActions";
+import PlayerActions from "@/components/PlayerActions";
 import MapArea from "@/components/MapArea";
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
         <div className={classes.store}>
           <BuildingsStore />
         </div>
+        <PlayerActions />
       </section>
       <MapArea className={classes.map} />
     </main>
