@@ -1,8 +1,8 @@
-import Map from "@/components/Map/Map";
 import BuildingsStore from "@/components/BuildingsStore";
 import Players from "@/components/Players";
 import Supply from "@/components/Supply";
 import DevelopmentActions from "@/components/DevelopmentActions";
+import MapArea from "@/components/MapArea";
 
 function App() {
   const developmentMode = true;
@@ -29,7 +29,7 @@ function App() {
           <BuildingsStore />
         </div>
       </section>
-      <Map className={classes.map} />
+      <MapArea className={classes.map} />
     </main>
   );
 }
