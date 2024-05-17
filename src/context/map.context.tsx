@@ -2,6 +2,7 @@ import { FC, ReactNode, Reducer, createContext, useReducer } from "react";
 import { EStatus } from "@/shared/enums/status.enum";
 import { ETerrains } from "@/shared/enums/terrains.enum";
 import { TField, TMap } from "@/shared/types/map.type";
+import { updateMapFields } from "@/shared/helpers/updateMapFields";
 
 type TContext = {
   map: TMap | [];
@@ -42,21 +43,16 @@ const reducer: Reducer<TReducer, TReducerActions> = (
   const { type, payload } = action;
   switch (type) {
     case "INIT": {
-      const identifyMap = () => {
-        const updatedMap = [...payload];
-        const rows = updatedMap.length;
-        const cols = updatedMap[0].length;
-        return updatedMap.map((row, rowIndex) =>
-          row.map((field, fieldIndex) => ({
-            ...field,
-            id: `${rowIndex}-${fieldIndex}-${rows}-${cols}`,
-            disabled: true,
-          }))
-        );
-      };
       return {
         ...state,
-        map: identifyMap(),
+        map: updateMapFields(payload, ({ rowIndex }, { colIndex }) => {
+          const mapRows = payload.length;
+          const mapCols = payload[0].length;
+          return {
+            id: `${rowIndex}-${colIndex}-${mapRows}-${mapCols}`,
+            disabled: true,
+          };
+        }),
       };
     }
 
@@ -86,28 +82,22 @@ const reducer: Reducer<TReducer, TReducerActions> = (
       if (status === EStatus.SELECT_ACTION) {
         return {
           ...state,
-          map: state.map.map((row) =>
-            row.map((field) => ({
-              ...field,
-              disabled: true,
-            }))
-          ),
+          map: updateMapFields(state.map, () => ({
+            disabled: true,
+          })),
         };
       }
 
       if (status === EStatus.SEND_WORKER || status === EStatus.BUILD) {
         return {
           ...state,
-          map: state.map.map((row) =>
-            row.map((field) => {
-              const isGrass = field.type === ETerrains.GRASS;
-              const haveOwner = isGrass && !!field.owner;
-              return {
-                ...field,
-                disabled: !isGrass || haveOwner,
-              };
-            })
-          ),
+          map: updateMapFields(state.map, (_, { colItem }) => {
+            const isGrass = colItem.type === ETerrains.GRASS;
+            const haveOwner = isGrass && !!colItem.owner;
+            return {
+              disabled: !isGrass || haveOwner,
+            };
+          }),
         };
       }
 
@@ -133,17 +123,14 @@ const reducer: Reducer<TReducer, TReducerActions> = (
 
         return {
           ...state,
-          map: state.map.map((row) =>
-            row.map((field) => {
-              const nearbyField = nearbyFields.includes(field.id!);
-              const isGrass = field.type === ETerrains.GRASS;
-              return {
-                ...field,
-                disabled:
-                  !nearbyField || (nearbyField && isGrass && !field.building),
-              };
-            })
-          ),
+          map: updateMapFields(state.map, (_, { colItem }) => {
+            const nearbyField = nearbyFields.includes(colItem.id!);
+            const isGrass = colItem.type === ETerrains.GRASS;
+            return {
+              disabled:
+                !nearbyField || (nearbyField && isGrass && !colItem.building),
+            };
+          }),
         };
       }
 
