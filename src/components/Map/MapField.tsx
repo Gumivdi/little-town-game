@@ -101,7 +101,7 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
 
   return (
     <button
-      onClick={() => actionHandler()}
+      onClick={actionHandler}
       disabled={field.disabled}
       className={classNames(classes.button, {
         "opacity-90": field.disabled,
