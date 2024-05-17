@@ -4,13 +4,13 @@ import { calculateResources } from "@/shared/helpers/calculateResources";
 
 type TContext = {
   supply: TResourcesOnly;
-  takeFromSupply: (resources: Partial<TResourcesOnly>) => void;
   restoreToSupply: (resources: Partial<TResourcesOnly>) => void;
+  takeFromSupply: (resources: Partial<TResourcesOnly>) => void;
 };
 
 type TReducerActions =
-  | { type: "TAKE"; payload: Partial<TResourcesOnly> }
-  | { type: "RESTORE"; payload: Partial<TResourcesOnly> };
+  | { type: "RESTORE"; payload: Partial<TResourcesOnly> }
+  | { type: "TAKE"; payload: Partial<TResourcesOnly> };
 
 export const SupplyContext = createContext<TContext>({
   supply: {
@@ -20,8 +20,8 @@ export const SupplyContext = createContext<TContext>({
     fish: 0,
     coin: 0,
   },
-  takeFromSupply: () => {},
   restoreToSupply: () => {},
+  takeFromSupply: () => {},
 });
 
 const reducer: Reducer<TResourcesOnly, TReducerActions> = (
@@ -31,14 +31,14 @@ const reducer: Reducer<TResourcesOnly, TReducerActions> = (
   const { type, payload } = action;
 
   switch (type) {
-    case "TAKE":
-      return {
-        ...calculateResources(state, payload, (a, b) => a - b),
-      };
-
     case "RESTORE":
       return {
         ...calculateResources(state, payload, (a, b) => a + b),
+      };
+
+    case "TAKE":
+      return {
+        ...calculateResources(state, payload, (a, b) => a - b),
       };
 
     default:
@@ -55,18 +55,18 @@ export const SupplyProvider: FC<{ children: ReactNode }> = ({ children }) => {
     coin: 40,
   });
 
-  const takeFromSupply = (resources: Partial<TResourcesOnly>) => {
-    dispatch({ type: "TAKE", payload: resources });
-  };
-
   const restoreToSupply = (resources: Partial<TResourcesOnly>) => {
     dispatch({ type: "RESTORE", payload: resources });
   };
 
+  const takeFromSupply = (resources: Partial<TResourcesOnly>) => {
+    dispatch({ type: "TAKE", payload: resources });
+  };
+
   const context = {
     supply: state,
-    takeFromSupply,
     restoreToSupply,
+    takeFromSupply,
   };
 
   return (

@@ -6,11 +6,11 @@ import { updateMapFields } from "@/shared/helpers/updateMapFields";
 
 type TContext = {
   map: TMap | [];
+  activateMapFields: (status: EStatus, fieldId?: string) => void;
+  build: (field: TField) => void;
+  disableMapField: (fieldId: string) => void;
   initMap: (map: TMap) => void;
   sendWorker: (playerId: number, field: TField) => void;
-  build: (field: TField) => void;
-  activateMapFields: (status: EStatus, fieldId?: string) => void;
-  disableMapField: (fieldId: string) => void;
 };
 
 type TReducer = {
@@ -18,22 +18,22 @@ type TReducer = {
 };
 
 type TReducerActions =
-  | { type: "INIT"; payload: TMap }
-  | { type: "SEND_WORKER"; payload: { playerId: number; field: TField } }
-  | { type: "BUILD"; payload: TField }
   | {
       type: "ACTIVATE_MAP_FIELDS";
       payload: { status: EStatus; fieldId?: string };
     }
-  | { type: "DISABLE_MAP_FIELD"; payload: string };
+  | { type: "BUILD"; payload: TField }
+  | { type: "DISABLE_MAP_FIELD"; payload: string }
+  | { type: "INIT"; payload: TMap }
+  | { type: "SEND_WORKER"; payload: { playerId: number; field: TField } };
 
 export const MapContext = createContext<TContext>({
   map: [],
+  activateMapFields: () => {},
+  build: () => {},
+  disableMapField: () => {},
   initMap: () => {},
   sendWorker: () => {},
-  build: () => {},
-  activateMapFields: () => {},
-  disableMapField: () => {},
 });
 
 const reducer: Reducer<TReducer, TReducerActions> = (
@@ -42,40 +42,6 @@ const reducer: Reducer<TReducer, TReducerActions> = (
 ): TReducer => {
   const { type, payload } = action;
   switch (type) {
-    case "INIT": {
-      return {
-        ...state,
-        map: updateMapFields(payload, ({ rowIndex }, { colIndex }) => {
-          const mapRows = payload.length;
-          const mapCols = payload[0].length;
-          return {
-            id: `${rowIndex}-${colIndex}-${mapRows}-${mapCols}`,
-            disabled: true,
-          };
-        }),
-      };
-    }
-
-    case "SEND_WORKER": {
-      const updatedMap = [...state.map];
-      const { playerId, field } = payload;
-      const fieldCoordinates = field.id!.split("-").map((item) => +item);
-      const [row, col] = fieldCoordinates;
-      const mapField = updatedMap[row][col];
-
-      if (mapField.type === ETerrains.GRASS && mapField.owner === null) {
-        mapField.owner = playerId;
-      }
-
-      return {
-        ...state,
-        map: updatedMap,
-      };
-    }
-
-    case "BUILD":
-      return state;
-
     case "ACTIVATE_MAP_FIELDS": {
       const { status, fieldId } = payload;
 
@@ -137,10 +103,44 @@ const reducer: Reducer<TReducer, TReducerActions> = (
       return state;
     }
 
+    case "BUILD":
+      return state;
+
     case "DISABLE_MAP_FIELD": {
       const updatedMap = [...state.map];
       const [row, col] = payload.split("-").map((item) => +item);
       updatedMap[row][col].disabled = true;
+      return {
+        ...state,
+        map: updatedMap,
+      };
+    }
+
+    case "INIT": {
+      return {
+        ...state,
+        map: updateMapFields(payload, ({ rowIndex }, { colIndex }) => {
+          const mapRows = payload.length;
+          const mapCols = payload[0].length;
+          return {
+            id: `${rowIndex}-${colIndex}-${mapRows}-${mapCols}`,
+            disabled: true,
+          };
+        }),
+      };
+    }
+
+    case "SEND_WORKER": {
+      const updatedMap = [...state.map];
+      const { playerId, field } = payload;
+      const fieldCoordinates = field.id!.split("-").map((item) => +item);
+      const [row, col] = fieldCoordinates;
+      const mapField = updatedMap[row][col];
+
+      if (mapField.type === ETerrains.GRASS && mapField.owner === null) {
+        mapField.owner = playerId;
+      }
+
       return {
         ...state,
         map: updatedMap,
@@ -155,6 +155,18 @@ const reducer: Reducer<TReducer, TReducerActions> = (
 export const MapProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, { map: [] });
 
+  const activateMapFields = (status: EStatus, fieldId?: string) => {
+    dispatch({ type: "ACTIVATE_MAP_FIELDS", payload: { status, fieldId } });
+  };
+
+  const build = (field: TField) => {
+    dispatch({ type: "BUILD", payload: field });
+  };
+
+  const disableMapField = (fieldId: string) => {
+    dispatch({ type: "DISABLE_MAP_FIELD", payload: fieldId });
+  };
+
   const initMap = (map: TMap) => {
     dispatch({ type: "INIT", payload: map });
   };
@@ -163,25 +175,13 @@ export const MapProvider: FC<{ children: ReactNode }> = ({ children }) => {
     dispatch({ type: "SEND_WORKER", payload: { playerId, field } });
   };
 
-  const build = (field: TField) => {
-    dispatch({ type: "BUILD", payload: field });
-  };
-
-  const activateMapFields = (status: EStatus, fieldId?: string) => {
-    dispatch({ type: "ACTIVATE_MAP_FIELDS", payload: { status, fieldId } });
-  };
-
-  const disableMapField = (fieldId: string) => {
-    dispatch({ type: "DISABLE_MAP_FIELD", payload: fieldId });
-  };
-
   const context = {
     map: state.map,
+    activateMapFields,
+    build,
+    disableMapField,
     initMap,
     sendWorker,
-    build,
-    activateMapFields,
-    disableMapField,
   };
   return <MapContext.Provider value={context}>{children}</MapContext.Provider>;
 };
