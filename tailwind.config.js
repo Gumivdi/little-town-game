@@ -10,6 +10,10 @@ export default {
     tailwindSafelistGenerator({
       path: "safelist.txt",
       patterns: [
+        "text-red-600",
+        "text-purple-600",
+        "text-orange-600",
+        "text-gray-600",
         "border-red-600",
         "border-purple-600",
         "border-orange-600",

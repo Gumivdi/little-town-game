@@ -14,10 +14,10 @@ type TContext = {
   currentPlayer: number;
   players: TPlayer[];
   initPlayers: (players: TPlayer[]) => void;
-  updatePlayer: (id: number, data: Partial<TPlayer>) => void;
   nextPlayer: () => void;
   payResources: (resources: Partial<TResourcesAll>) => void;
   receiveResources: (resources: Partial<TResourcesAll>) => void;
+  updatePlayer: (id: number, data: Partial<TPlayer>) => void;
 };
 
 type TReducer = {
@@ -26,7 +26,6 @@ type TReducer = {
 
 type TReducerActions =
   | { type: "INIT"; payload: TPlayer[] }
-  | { type: "UPDATE"; payload: { id: number; player: Partial<TPlayer> } }
   | {
       type: "PAY";
       payload: { playerIndex: number; resources: Partial<TResourcesAll> };
@@ -34,16 +33,17 @@ type TReducerActions =
   | {
       type: "RECEIVE";
       payload: { playerIndex: number; resources: Partial<TResourcesAll> };
-    };
+    }
+  | { type: "UPDATE"; payload: { id: number; player: Partial<TPlayer> } };
 
 export const PlayersContext = createContext<TContext>({
   currentPlayer: 0,
   players: [],
   initPlayers: () => {},
-  updatePlayer: () => {},
   nextPlayer: () => {},
   payResources: () => {},
   receiveResources: () => {},
+  updatePlayer: () => {},
 });
 
 const reducer: Reducer<TReducer, TReducerActions> = (
@@ -66,18 +66,6 @@ const reducer: Reducer<TReducer, TReducerActions> = (
       return {
         ...state,
         players: payload,
-      };
-    }
-
-    case "UPDATE": {
-      const playersState = [...state.players];
-      return {
-        ...state,
-        players: playersState.map((player) =>
-          player.id === payload.id
-            ? updatePlayerData(player, payload.player)
-            : player
-        ),
       };
     }
 
@@ -119,6 +107,18 @@ const reducer: Reducer<TReducer, TReducerActions> = (
       };
     }
 
+    case "UPDATE": {
+      const playersState = [...state.players];
+      return {
+        ...state,
+        players: playersState.map((player) =>
+          player.id === payload.id
+            ? updatePlayerData(player, payload.player)
+            : player
+        ),
+      };
+    }
+
     default:
       return state;
   }
@@ -132,8 +132,9 @@ export const PlayersProvider: FC<{ children: ReactNode }> = ({ children }) => {
     dispatch({ type: "INIT", payload: players });
   };
 
-  const updatePlayer = (id: number, player: Partial<TPlayer>) => {
-    dispatch({ type: "UPDATE", payload: { id, player } });
+  const nextPlayer = () => {
+    const isLastPlayer = currentPlayer === state.players.length - 1;
+    setCurrentPlayer(isLastPlayer ? 0 : currentPlayer + 1);
   };
 
   const payResources = (resources: Partial<TResourcesAll>) => {
@@ -150,19 +151,18 @@ export const PlayersProvider: FC<{ children: ReactNode }> = ({ children }) => {
     });
   };
 
-  const nextPlayer = () => {
-    const isLastPlayer = currentPlayer === state.players.length - 1;
-    setCurrentPlayer(isLastPlayer ? 0 : currentPlayer + 1);
+  const updatePlayer = (id: number, player: Partial<TPlayer>) => {
+    dispatch({ type: "UPDATE", payload: { id, player } });
   };
 
   const context = {
     currentPlayer: currentPlayer,
     players: state.players,
     initPlayers,
-    updatePlayer,
     nextPlayer,
     payResources,
     receiveResources,
+    updatePlayer,
   };
 
   return (
