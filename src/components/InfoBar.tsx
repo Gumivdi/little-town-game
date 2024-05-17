@@ -14,7 +14,7 @@ const InfoBar: FC<{ children?: ReactNode }> = ({ children }) => {
   };
 
   return (
-    <section className="w-full absolute top-0 bg-black/60 text-white p-3 flex gap-2 justify-between items-center">
+    <section className="w-full absolute top-0 bg-black/60 text-white p-3 flex gap-2 justify-between items-center z-10">
       <p className="text-center w-full">{messages[status]}</p>
       {children}
     </section>
