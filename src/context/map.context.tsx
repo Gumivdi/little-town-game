@@ -46,65 +46,63 @@ const reducer: Reducer<TReducer, TReducerActions> = (
   switch (type) {
     case "ACTIVATE_MAP_FIELDS": {
       const { status, fieldId } = payload;
-      switch (status) {
-        case EStatus.SELECT_ACTION: {
-          return {
-            ...state,
-            map: updateMapFields(state.map, () => ({
-              disabled: true,
-            })),
-          };
-        }
 
-        case EStatus.SEND_WORKER || status === EStatus.BUILD: {
-          return {
-            ...state,
-            map: updateMapFields(state.map, (_, { colItem }) => {
-              const isGrass = colItem.type === ETerrains.GRASS;
-              const haveOwner = isGrass && !!colItem.owner;
-              return {
-                disabled: !isGrass || haveOwner,
-              };
-            }),
-          };
-        }
-
-        case EStatus.COLLECT: {
-          const [row, col, mapRows, mapCols] = getFieldCoordinates(fieldId!);
-          const nearbyFields: string[] = [];
-          const nearbyRows = [row - 1, row, row + 1];
-          const nearbyCols = [col - 1, col, col + 1];
-          const avaliableRows = nearbyRows.filter(
-            (item) => item > -1 && item < +mapRows
-          );
-          const avaliableCols = nearbyCols.filter(
-            (item) => item > -1 && item < +mapCols
-          );
-
-          for (const fieldRow of avaliableRows) {
-            for (const fieldCol of avaliableCols) {
-              const nearbyFieldId = `${fieldRow}-${fieldCol}-${mapRows}-${mapCols}`;
-              if (nearbyFieldId === fieldId) continue;
-              nearbyFields.push(nearbyFieldId);
-            }
-          }
-
-          return {
-            ...state,
-            map: updateMapFields(state.map, (_, { colItem }) => {
-              const nearbyField = nearbyFields.includes(colItem.id!);
-              const isGrass = colItem.type === ETerrains.GRASS;
-              return {
-                disabled:
-                  !nearbyField || (nearbyField && isGrass && !colItem.building),
-              };
-            }),
-          };
-        }
-
-        default:
-          return state;
+      if (status === EStatus.SELECT_ACTION) {
+        return {
+          ...state,
+          map: updateMapFields(state.map, () => ({
+            disabled: true,
+          })),
+        };
       }
+
+      if (status === EStatus.SEND_WORKER || status === EStatus.BUILD) {
+        return {
+          ...state,
+          map: updateMapFields(state.map, (_, { colItem }) => {
+            const isGrass = colItem.type === ETerrains.GRASS;
+            const haveOwner = isGrass && !!colItem.owner;
+            return {
+              disabled: !isGrass || haveOwner,
+            };
+          }),
+        };
+      }
+
+      if (status === EStatus.COLLECT) {
+        const [row, col, mapRows, mapCols] = getFieldCoordinates(fieldId!);
+        const nearbyFields: string[] = [];
+        const nearbyRows = [row - 1, row, row + 1];
+        const nearbyCols = [col - 1, col, col + 1];
+        const avaliableRows = nearbyRows.filter(
+          (item) => item > -1 && item < +mapRows
+        );
+        const avaliableCols = nearbyCols.filter(
+          (item) => item > -1 && item < +mapCols
+        );
+
+        for (const fieldRow of avaliableRows) {
+          for (const fieldCol of avaliableCols) {
+            const nearbyFieldId = `${fieldRow}-${fieldCol}-${mapRows}-${mapCols}`;
+            if (nearbyFieldId === fieldId) continue;
+            nearbyFields.push(nearbyFieldId);
+          }
+        }
+
+        return {
+          ...state,
+          map: updateMapFields(state.map, (_, { colItem }) => {
+            const nearbyField = nearbyFields.includes(colItem.id!);
+            const isGrass = colItem.type === ETerrains.GRASS;
+            return {
+              disabled:
+                !nearbyField || (nearbyField && isGrass && !colItem.building),
+            };
+          }),
+        };
+      }
+
+      return state;
     }
 
     case "BUILD":
