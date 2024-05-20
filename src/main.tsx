@@ -7,6 +7,7 @@ import { SupplyProvider } from "@/context/supply.context.tsx";
 import { PlayersProvider } from "@/context/players.context.tsx";
 import { MapProvider } from "@/context/map.context.tsx";
 import { StatusProvider } from "@/context/status.context.tsx";
+import { BuildingsProvider } from "@/context/buildings.context.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -14,7 +15,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <SupplyProvider>
         <PlayersProvider>
           <MapProvider>
-            <App />
+            <BuildingsProvider>
+              <App />
+            </BuildingsProvider>
           </MapProvider>
         </PlayersProvider>
       </SupplyProvider>
