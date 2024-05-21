@@ -20,7 +20,7 @@ const BuildingsStore = () => {
 
     const isCorrectStatus = status === EStatus.SELECT_BUILDING;
     const canBePaid = availableBuildings.includes(building.name);
-    const isDisabled = isCorrectStatus && (!isCorrectStatus || !canBePaid);
+    const isDisabled = !isCorrectStatus || !canBePaid;
 
     const placeBuildingHandler = () => {
       selectBuilding(building);
