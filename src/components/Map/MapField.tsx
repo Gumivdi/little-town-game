@@ -9,6 +9,8 @@ import { EStatus } from "@/shared/enums/status.enum";
 import { PlayersContext } from "@/context/players.context";
 import { StatusContext } from "@/context/status.context";
 import { SupplyContext } from "@/context/supply.context";
+import { BuildingsContext } from "@/context/buildings.context";
+import Building from "@/components/Building/Building";
 
 import ImgForrest from "@/assets/map/forrest.svg";
 import ImgPond from "@/assets/map/pond.svg";
@@ -27,24 +29,35 @@ const classes = {
 };
 
 const MapField: React.FC<{ field: TField }> = ({ field }) => {
-  const { takeFromSupply } = useContext(SupplyContext);
+  const { selectedBuilding, removeBuilding } = useContext(BuildingsContext);
+  const { takeFromSupply, restoreToSupply } = useContext(SupplyContext);
   const { status, setStatus } = useContext(StatusContext);
-  const { map, sendWorker, activateMapFields, disableMapField } =
+  const { map, sendWorker, activateMapFields, disableMapField, build } =
     useContext(MapContext);
-  const { players, currentPlayer, receiveResources, updatePlayer, nextPlayer } =
-    useContext(PlayersContext);
+  const {
+    players,
+    currentPlayer,
+    receiveResources,
+    payResources,
+    updatePlayer,
+    nextPlayer,
+  } = useContext(PlayersContext);
+
+  let ownerColor = "";
+  let nameKey = "";
   const isGrass = field.type === ETerrains.GRASS;
+  const isBuilding = isGrass && !!field.owner && !!field.building;
+  const isOwnerWithoutBuilding = isGrass && !!field.owner && !field.building;
+  if (isGrass) {
+    ownerColor = players[field.owner! - 1]?.color;
+    nameKey =
+      field.building?.name
+        .replace(" ", "_")
+        .concat(`-${players[currentPlayer].id}`) || "";
+  }
 
   const getFieldImage = (type: ETerrains) =>
     isGrass ? null : <ReactSVG src={fieldImages[type]!} />;
-
-  const placeWorker = () => {
-    const player = players[currentPlayer];
-    sendWorker(player.id, field);
-    updatePlayer(player.id, { workers: player.workers - 1 });
-    activateMapFields(EStatus.COLLECT, field.id);
-    setStatus(EStatus.COLLECT);
-  };
 
   const finishCollecting = () => {
     setStatus(EStatus.SELECT_ACTION);
@@ -53,13 +66,20 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
   };
 
   const actionHandler = () => {
+    const player = players[currentPlayer];
+    const { id, workers, buildings } = player;
+
     const isSomethingToCollect =
       map.flat().filter((item) => !item.disabled).length - 1;
 
     switch (status) {
-      case EStatus.SEND_WORKER:
-        placeWorker();
+      case EStatus.SEND_WORKER: {
+        sendWorker(id, field);
+        updatePlayer(id, { workers: workers - 1 });
+        activateMapFields(EStatus.COLLECT, field.id);
+        setStatus(EStatus.COLLECT);
         break;
+      }
 
       case EStatus.COLLECT:
         {
@@ -94,6 +114,25 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
         }
         break;
 
+      case EStatus.BUILD: {
+        const building = selectedBuilding!;
+        const { name, cost, point } = building;
+
+        updatePlayer(id, {
+          workers: workers - 1,
+          buildings: buildings - 1,
+        });
+        payResources(cost);
+        restoreToSupply(cost);
+        build(field, building, id);
+        receiveResources({ point });
+        removeBuilding(name);
+        setStatus(EStatus.SELECT_ACTION);
+        activateMapFields(EStatus.SELECT_ACTION);
+        nextPlayer();
+        break;
+      }
+
       default:
         break;
     }
@@ -108,13 +147,21 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
         "hover:bg-green-600": !field.disabled,
       })}
     >
-      {isGrass && !!field.owner && (
+      {isOwnerWithoutBuilding && (
         <ReactSVG
-          className={`size-8 text-${
-            players[field.owner - 1].color
-          }-600 mx-auto`}
+          className={`size-8 text-${ownerColor}-600 mx-auto`}
           src={ImgWorker}
         />
+      )}
+
+      {isBuilding && (
+        <Building>
+          <header
+            className={`w-full border-solid border-t-8 border-${ownerColor}-600`}
+          ></header>
+          <Building.Main building={field.building!} />
+          <Building.Footer building={field.building!} nameKey={nameKey} />
+        </Building>
       )}
       {getFieldImage(field.type)}
     </button>

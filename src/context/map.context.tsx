@@ -5,11 +5,12 @@ import { TField, TMap } from "@/shared/types/map.type";
 import { updateMapField } from "@/shared/helpers/updateMapField";
 import { updateMapFields } from "@/shared/helpers/updateMapFields";
 import { getFieldCoordinates } from "@/shared/helpers/getFieldCoordinates";
+import { TBuilding } from "@/shared/types/building.type";
 
 type TContext = {
   map: TMap | [];
   activateMapFields: (status: EStatus, fieldId?: string) => void;
-  build: (field: TField) => void;
+  build: (field: TField, building: TBuilding, playerId: number) => void;
   disableMapField: (fieldId: string) => void;
   initMap: (map: TMap) => void;
   sendWorker: (playerId: number, field: TField) => void;
@@ -24,7 +25,10 @@ type TReducerActions =
       type: "ACTIVATE_MAP_FIELDS";
       payload: { status: EStatus; fieldId?: string };
     }
-  | { type: "BUILD"; payload: TField }
+  | {
+      type: "BUILD";
+      payload: { field: TField; building: TBuilding; playerId: number };
+    }
   | { type: "DISABLE_MAP_FIELD"; payload: string }
   | { type: "INIT"; payload: TMap }
   | { type: "SEND_WORKER"; payload: { playerId: number; field: TField } };
@@ -46,69 +50,76 @@ const reducer: Reducer<TReducer, TReducerActions> = (
   switch (type) {
     case "ACTIVATE_MAP_FIELDS": {
       const { status, fieldId } = payload;
-      switch (status) {
-        case EStatus.SELECT_ACTION: {
-          return {
-            ...state,
-            map: updateMapFields(state.map, () => ({
-              disabled: true,
-            })),
-          };
-        }
 
-        case EStatus.SEND_WORKER || status === EStatus.BUILD: {
-          return {
-            ...state,
-            map: updateMapFields(state.map, (_, { colItem }) => {
-              const isGrass = colItem.type === ETerrains.GRASS;
-              const haveOwner = isGrass && !!colItem.owner;
-              return {
-                disabled: !isGrass || haveOwner,
-              };
-            }),
-          };
-        }
-
-        case EStatus.COLLECT: {
-          const [row, col, mapRows, mapCols] = getFieldCoordinates(fieldId!);
-          const nearbyFields: string[] = [];
-          const nearbyRows = [row - 1, row, row + 1];
-          const nearbyCols = [col - 1, col, col + 1];
-          const avaliableRows = nearbyRows.filter(
-            (item) => item > -1 && item < +mapRows
-          );
-          const avaliableCols = nearbyCols.filter(
-            (item) => item > -1 && item < +mapCols
-          );
-
-          for (const fieldRow of avaliableRows) {
-            for (const fieldCol of avaliableCols) {
-              const nearbyFieldId = `${fieldRow}-${fieldCol}-${mapRows}-${mapCols}`;
-              if (nearbyFieldId === fieldId) continue;
-              nearbyFields.push(nearbyFieldId);
-            }
-          }
-
-          return {
-            ...state,
-            map: updateMapFields(state.map, (_, { colItem }) => {
-              const nearbyField = nearbyFields.includes(colItem.id!);
-              const isGrass = colItem.type === ETerrains.GRASS;
-              return {
-                disabled:
-                  !nearbyField || (nearbyField && isGrass && !colItem.building),
-              };
-            }),
-          };
-        }
-
-        default:
-          return state;
+      if (status === EStatus.SELECT_ACTION) {
+        return {
+          ...state,
+          map: updateMapFields(state.map, () => ({
+            disabled: true,
+          })),
+        };
       }
+
+      if (status === EStatus.SEND_WORKER || status === EStatus.BUILD) {
+        return {
+          ...state,
+          map: updateMapFields(state.map, (_, { colItem }) => {
+            const isGrass = colItem.type === ETerrains.GRASS;
+            const haveOwner = isGrass && !!colItem.owner;
+            return {
+              disabled: !isGrass || haveOwner,
+            };
+          }),
+        };
+      }
+
+      if (status === EStatus.COLLECT) {
+        const [row, col, mapRows, mapCols] = getFieldCoordinates(fieldId!);
+        const nearbyFields: string[] = [];
+        const nearbyRows = [row - 1, row, row + 1];
+        const nearbyCols = [col - 1, col, col + 1];
+        const avaliableRows = nearbyRows.filter(
+          (item) => item > -1 && item < +mapRows
+        );
+        const avaliableCols = nearbyCols.filter(
+          (item) => item > -1 && item < +mapCols
+        );
+
+        for (const fieldRow of avaliableRows) {
+          for (const fieldCol of avaliableCols) {
+            const nearbyFieldId = `${fieldRow}-${fieldCol}-${mapRows}-${mapCols}`;
+            if (nearbyFieldId === fieldId) continue;
+            nearbyFields.push(nearbyFieldId);
+          }
+        }
+
+        return {
+          ...state,
+          map: updateMapFields(state.map, (_, { colItem }) => {
+            const nearbyField = nearbyFields.includes(colItem.id!);
+            const isGrass = colItem.type === ETerrains.GRASS;
+            return {
+              disabled:
+                !nearbyField || (nearbyField && isGrass && !colItem.building),
+            };
+          }),
+        };
+      }
+
+      return state;
     }
 
-    case "BUILD":
-      return state;
+    case "BUILD": {
+      const { field, building, playerId } = payload;
+      return {
+        ...state,
+        map: updateMapField(state.map, field.id!, (mapField) => ({
+          ...mapField,
+          building,
+          owner: playerId,
+        })),
+      };
+    }
 
     case "DISABLE_MAP_FIELD": {
       return {
@@ -157,8 +168,8 @@ export const MapProvider: FC<{ children: ReactNode }> = ({ children }) => {
     dispatch({ type: "ACTIVATE_MAP_FIELDS", payload: { status, fieldId } });
   };
 
-  const build = (field: TField) => {
-    dispatch({ type: "BUILD", payload: field });
+  const build = (field: TField, building: TBuilding, playerId: number) => {
+    dispatch({ type: "BUILD", payload: { field, building, playerId } });
   };
 
   const disableMapField = (fieldId: string) => {
@@ -174,7 +185,7 @@ export const MapProvider: FC<{ children: ReactNode }> = ({ children }) => {
   };
 
   const context = {
-    map: state.map,
+    ...state,
     activateMapFields,
     build,
     disableMapField,

@@ -1,3 +1,5 @@
+import { useContext } from "react";
+import { PlayersContext } from "@/context/players.context";
 import BuildingsStore from "@/components/BuildingsStore";
 import Players from "@/components/Players";
 import Supply from "@/components/Supply";
@@ -5,8 +7,9 @@ import DevelopmentActions from "@/components/DevelopmentActions";
 import MapArea from "@/components/MapArea";
 
 function App() {
-  const developmentMode = true;
+  const { players } = useContext(PlayersContext);
 
+  const developmentMode = true;
   const classes = {
     main: "grid",
     sidebar: "grid gap-4 p-3 max-h-svh",
@@ -23,11 +26,15 @@ function App() {
         }}
       >
         {developmentMode && <DevelopmentActions />}
-        <Supply />
-        <Players />
-        <div className={classes.store}>
-          <BuildingsStore />
-        </div>
+        {!!players.length && (
+          <>
+            <Supply />
+            <Players />
+            <div className={classes.store}>
+              <BuildingsStore />
+            </div>
+          </>
+        )}
       </section>
       <MapArea className={classes.map} />
     </main>

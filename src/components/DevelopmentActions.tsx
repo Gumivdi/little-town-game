@@ -8,10 +8,12 @@ import { TResourcesAll } from "@/shared/types/resources.type";
 import { PlayersContext } from "@/context/players.context";
 import { SupplyContext } from "@/context/supply.context";
 import { MapContext } from "@/context/map.context";
+import { BuildingsContext } from "@/context/buildings.context";
 
 const DevelopmentActions = () => {
   const { initMap } = useContext(MapContext);
   const { takeFromSupply, restoreToSupply } = useContext(SupplyContext);
+  const { initRecommended } = useContext(BuildingsContext);
   const {
     currentPlayer,
     initPlayers,
@@ -35,6 +37,7 @@ const DevelopmentActions = () => {
   const setupTheGame = () => {
     initializePlayers();
     initializeMap(0);
+    initRecommended();
   };
 
   const pay = (resources: Partial<TResourcesAll>) => {

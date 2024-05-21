@@ -4,7 +4,7 @@ import BuildingMain from "./BuildingMain";
 import BuildingFooter from "./BuildingFooter";
 
 const Building: React.FC<TProps> & TCompoundComponents = ({ children }) => (
-  <div className="bg-gray-300 flex flex-col items-center justify-between gap-4 p-2">
+  <div className="h-full bg-gray-300 flex flex-col items-center justify-between gap-4 p-2">
     {children}
   </div>
 );
