@@ -7,19 +7,19 @@ import { TPlayer } from "@/shared/types/player.type";
 import { EResources } from "@/shared/enums/resources.enum";
 
 type TContext = {
-  buildings: TBuilding[];
   availableBuildings: EBuildings[];
+  buildings: TBuilding[];
   selectedBuilding: TBuilding | null;
   initBuildings: () => void;
   initRecommended: () => void;
   removeBuilding: (name: EBuildings) => void;
-  setAvailableBuildings: (player: TPlayer) => void;
   selectBuilding: (building: TBuilding) => void;
+  setAvailableBuildings: (player: TPlayer) => void;
 };
 
 type TReducer = {
-  buildings: TBuilding[];
   availableBuildings: EBuildings[];
+  buildings: TBuilding[];
   selectedBuilding: TBuilding | null;
 };
 
@@ -27,18 +27,18 @@ type TReducerActions =
   | { type: "INIT"; payload: null }
   | { type: "INIT_RECOMMENDED"; payload: null }
   | { type: "REMOVE"; payload: EBuildings }
-  | { type: "SET_AVAILABLE_BUILDINGS"; payload: TPlayer }
-  | { type: "SELECT_BUILDING"; payload: TBuilding };
+  | { type: "SELECT_BUILDING"; payload: TBuilding }
+  | { type: "SET_AVAILABLE_BUILDINGS"; payload: TPlayer };
 
 export const BuildingsContext = createContext<TContext>({
-  buildings: [],
   availableBuildings: [],
+  buildings: [],
   selectedBuilding: null,
   initBuildings: () => {},
   initRecommended: () => {},
   removeBuilding: () => {},
-  setAvailableBuildings: () => {},
   selectBuilding: () => {},
+  setAvailableBuildings: () => {},
 });
 
 const reducer: Reducer<TReducer, TReducerActions> = (
@@ -89,6 +89,12 @@ const reducer: Reducer<TReducer, TReducerActions> = (
       };
     }
 
+    case "SELECT_BUILDING":
+      return {
+        ...state,
+        selectedBuilding: payload,
+      };
+
     case "SET_AVAILABLE_BUILDINGS": {
       const availableBuildingsName = [...state.buildings]
         .filter((building) => {
@@ -109,12 +115,6 @@ const reducer: Reducer<TReducer, TReducerActions> = (
         availableBuildings: availableBuildingsName,
       };
     }
-
-    case "SELECT_BUILDING":
-      return {
-        ...state,
-        selectedBuilding: payload,
-      };
 
     default:
       return state;
@@ -142,12 +142,12 @@ export const BuildingsProvider: FC<{ children: ReactNode }> = ({
     dispatch({ type: "REMOVE", payload: name });
   };
 
-  const setAvailableBuildings = (player: TPlayer) => {
-    dispatch({ type: "SET_AVAILABLE_BUILDINGS", payload: player });
-  };
-
   const selectBuilding = (building: TBuilding) => {
     dispatch({ type: "SELECT_BUILDING", payload: building });
+  };
+
+  const setAvailableBuildings = (player: TPlayer) => {
+    dispatch({ type: "SET_AVAILABLE_BUILDINGS", payload: player });
   };
 
   const context = {
@@ -155,8 +155,8 @@ export const BuildingsProvider: FC<{ children: ReactNode }> = ({
     initBuildings,
     initRecommended,
     removeBuilding,
-    setAvailableBuildings,
     selectBuilding,
+    setAvailableBuildings,
   };
 
   return (

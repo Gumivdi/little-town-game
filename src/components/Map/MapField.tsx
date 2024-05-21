@@ -43,17 +43,17 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
     nextPlayer,
   } = useContext(PlayersContext);
 
-  let playerColor = "";
+  let ownerColor = "";
   let nameKey = "";
   const isGrass = field.type === ETerrains.GRASS;
   const isBuilding = isGrass && !!field.owner && !!field.building;
   const isOwnerWithoutBuilding = isGrass && !!field.owner && !field.building;
   if (isGrass) {
-    playerColor = players[field.owner! - 1]?.color;
+    ownerColor = players[field.owner! - 1]?.color;
     nameKey =
       field.building?.name
         .replace(" ", "_")
-        .concat(`${players[currentPlayer].id}`) || "";
+        .concat(`-${players[currentPlayer].id}`) || "";
   }
 
   const getFieldImage = (type: ETerrains) =>
@@ -66,14 +66,16 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
   };
 
   const actionHandler = () => {
+    const player = players[currentPlayer];
+    const { id, workers, buildings } = player;
+
     const isSomethingToCollect =
       map.flat().filter((item) => !item.disabled).length - 1;
 
     switch (status) {
       case EStatus.SEND_WORKER: {
-        const player = players[currentPlayer];
-        sendWorker(player.id, field);
-        updatePlayer(player.id, { workers: player.workers - 1 });
+        sendWorker(id, field);
+        updatePlayer(id, { workers: workers - 1 });
         activateMapFields(EStatus.COLLECT, field.id);
         setStatus(EStatus.COLLECT);
         break;
@@ -113,17 +115,18 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
         break;
 
       case EStatus.BUILD: {
-        const player = players[currentPlayer];
         const building = selectedBuilding!;
-        updatePlayer(player.id, {
-          workers: player.workers - 1,
-          buildings: player.buildings - 1,
+        const { name, cost, point } = building;
+
+        updatePlayer(id, {
+          workers: workers - 1,
+          buildings: buildings - 1,
         });
-        payResources(building.cost);
-        restoreToSupply(building.cost);
-        build(field, building, player.id);
-        receiveResources({ point: building.point });
-        removeBuilding(building.name);
+        payResources(cost);
+        restoreToSupply(cost);
+        build(field, building, id);
+        receiveResources({ point });
+        removeBuilding(name);
         setStatus(EStatus.SELECT_ACTION);
         activateMapFields(EStatus.SELECT_ACTION);
         nextPlayer();
@@ -146,7 +149,7 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
     >
       {isOwnerWithoutBuilding && (
         <ReactSVG
-          className={`size-8 text-${playerColor}-600 mx-auto`}
+          className={`size-8 text-${ownerColor}-600 mx-auto`}
           src={ImgWorker}
         />
       )}
@@ -154,7 +157,7 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
       {isBuilding && (
         <Building>
           <header
-            className={`w-full border-solid border-t-8 border-${playerColor}-600`}
+            className={`w-full border-solid border-t-8 border-${ownerColor}-600`}
           ></header>
           <Building.Main building={field.building!} />
           <Building.Footer building={field.building!} nameKey={nameKey} />
