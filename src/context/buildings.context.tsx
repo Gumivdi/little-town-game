@@ -9,30 +9,36 @@ import { EResources } from "@/shared/enums/resources.enum";
 type TContext = {
   buildings: TBuilding[];
   availableBuildings: EBuildings[];
+  selectedBuilding: TBuilding | null;
   initBuildings: () => void;
   initRecommended: () => void;
   removeBuilding: (name: EBuildings) => void;
   setAvailableBuildings: (player: TPlayer) => void;
+  selectBuilding: (building: TBuilding) => void;
 };
 
 type TReducer = {
   buildings: TBuilding[];
   availableBuildings: EBuildings[];
+  selectedBuilding: TBuilding | null;
 };
 
 type TReducerActions =
   | { type: "INIT"; payload: null }
   | { type: "INIT_RECOMMENDED"; payload: null }
   | { type: "REMOVE"; payload: EBuildings }
-  | { type: "SET_AVAILABLE_BUILDINGS"; payload: TPlayer };
+  | { type: "SET_AVAILABLE_BUILDINGS"; payload: TPlayer }
+  | { type: "SELECT_BUILDING"; payload: TBuilding };
 
 export const BuildingsContext = createContext<TContext>({
   buildings: [],
   availableBuildings: [],
+  selectedBuilding: null,
   initBuildings: () => {},
   initRecommended: () => {},
   removeBuilding: () => {},
   setAvailableBuildings: () => {},
+  selectBuilding: () => {},
 });
 
 const reducer: Reducer<TReducer, TReducerActions> = (
@@ -79,6 +85,7 @@ const reducer: Reducer<TReducer, TReducerActions> = (
       return {
         ...state,
         buildings: filteredMarket,
+        selectedBuilding: null,
       };
     }
 
@@ -103,6 +110,12 @@ const reducer: Reducer<TReducer, TReducerActions> = (
       };
     }
 
+    case "SELECT_BUILDING":
+      return {
+        ...state,
+        selectedBuilding: payload,
+      };
+
     default:
       return state;
   }
@@ -114,6 +127,7 @@ export const BuildingsProvider: FC<{ children: ReactNode }> = ({
   const [state, dispatch] = useReducer(reducer, {
     buildings: [],
     availableBuildings: [],
+    selectedBuilding: null,
   });
 
   const initBuildings = () => {
@@ -132,12 +146,17 @@ export const BuildingsProvider: FC<{ children: ReactNode }> = ({
     dispatch({ type: "SET_AVAILABLE_BUILDINGS", payload: player });
   };
 
+  const selectBuilding = (building: TBuilding) => {
+    dispatch({ type: "SELECT_BUILDING", payload: building });
+  };
+
   const context = {
     ...state,
     initBuildings,
     initRecommended,
     removeBuilding,
     setAvailableBuildings,
+    selectBuilding,
   };
 
   return (

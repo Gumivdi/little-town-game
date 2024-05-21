@@ -5,11 +5,12 @@ import { TField, TMap } from "@/shared/types/map.type";
 import { updateMapField } from "@/shared/helpers/updateMapField";
 import { updateMapFields } from "@/shared/helpers/updateMapFields";
 import { getFieldCoordinates } from "@/shared/helpers/getFieldCoordinates";
+import { TBuilding } from "@/shared/types/building.type";
 
 type TContext = {
   map: TMap | [];
   activateMapFields: (status: EStatus, fieldId?: string) => void;
-  build: (field: TField) => void;
+  build: (field: TField, building: TBuilding, playerId: number) => void;
   disableMapField: (fieldId: string) => void;
   initMap: (map: TMap) => void;
   sendWorker: (playerId: number, field: TField) => void;
@@ -24,7 +25,10 @@ type TReducerActions =
       type: "ACTIVATE_MAP_FIELDS";
       payload: { status: EStatus; fieldId?: string };
     }
-  | { type: "BUILD"; payload: TField }
+  | {
+      type: "BUILD";
+      payload: { field: TField; building: TBuilding; playerId: number };
+    }
   | { type: "DISABLE_MAP_FIELD"; payload: string }
   | { type: "INIT"; payload: TMap }
   | { type: "SEND_WORKER"; payload: { playerId: number; field: TField } };
@@ -105,8 +109,17 @@ const reducer: Reducer<TReducer, TReducerActions> = (
       return state;
     }
 
-    case "BUILD":
-      return state;
+    case "BUILD": {
+      const { field, building, playerId } = payload;
+      return {
+        ...state,
+        map: updateMapField(state.map, field.id!, (mapField) => ({
+          ...mapField,
+          building,
+          owner: playerId,
+        })),
+      };
+    }
 
     case "DISABLE_MAP_FIELD": {
       return {
@@ -155,8 +168,8 @@ export const MapProvider: FC<{ children: ReactNode }> = ({ children }) => {
     dispatch({ type: "ACTIVATE_MAP_FIELDS", payload: { status, fieldId } });
   };
 
-  const build = (field: TField) => {
-    dispatch({ type: "BUILD", payload: field });
+  const build = (field: TField, building: TBuilding, playerId: number) => {
+    dispatch({ type: "BUILD", payload: { field, building, playerId } });
   };
 
   const disableMapField = (fieldId: string) => {
@@ -172,7 +185,7 @@ export const MapProvider: FC<{ children: ReactNode }> = ({ children }) => {
   };
 
   const context = {
-    map: state.map,
+    ...state,
     activateMapFields,
     build,
     disableMapField,

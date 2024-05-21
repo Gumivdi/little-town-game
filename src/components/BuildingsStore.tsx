@@ -10,6 +10,7 @@ const BuildingsStore = () => {
   const { status, setStatus } = useContext(StatusContext);
   const { buildings, availableBuildings } = useContext(BuildingsContext);
   const { activateMapFields } = useContext(MapContext);
+  const { selectBuilding } = useContext(BuildingsContext);
 
   return buildings.map((building) => {
     const { name } = building;
@@ -22,6 +23,7 @@ const BuildingsStore = () => {
     const isDisabled = isCorrectStatus && (!isCorrectStatus || !canBePaid);
 
     const placeBuildingHandler = () => {
+      selectBuilding(building);
       setStatus(EStatus.BUILD);
       activateMapFields(EStatus.BUILD);
     };
