@@ -1,15 +1,17 @@
-export const calculateResources = <T>(
-  base: Record<keyof T, number>,
-  resources: Partial<Record<keyof T, number>>,
+export const calculateResources = <T extends Record<string, number>>(
+  base: T,
+  resources: Partial<T>,
   operation: (a: number, b: number) => number
-) => {
+): T => {
   const calculatedResources = { ...base };
+
   for (const key in resources) {
     const typedKey = key as keyof T;
     calculatedResources[typedKey] = operation(
-      calculatedResources[typedKey],
-      resources[typedKey]!
-    );
+      base[typedKey] ?? 0,
+      resources[typedKey] ?? 0
+    ) as T[keyof T];
   }
+
   return calculatedResources;
 };

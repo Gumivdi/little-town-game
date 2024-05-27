@@ -68,7 +68,7 @@ const DevelopmentActions = () => {
         Receive
       </button>
       <button className="bg-black p-3" onClick={nextPlayer}>
-        Next player ({currentPlayer})
+        Next player ({currentPlayer.name})
       </button>
     </div>
   );

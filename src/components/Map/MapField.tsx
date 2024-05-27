@@ -2,10 +2,14 @@ import { useContext } from "react";
 import { ReactSVG } from "react-svg";
 import classNames from "classnames";
 
+import { EStatus } from "@/shared/enums/status.enum";
 import { ETerrains } from "@/shared/enums/terrains.enum";
 import { TField } from "@/shared/types/map.type";
+import { TResourcesOnly } from "@/shared/types/resources.type";
+import { hasEnoughResources } from "@/shared/helpers/hasEnoughResources";
+import { convertToResourceOnly } from "@/shared/helpers/convertToResourceOnly";
+import { calculateResources } from "@/shared/helpers/calculateResources";
 import { MapContext } from "@/context/map.context";
-import { EStatus } from "@/shared/enums/status.enum";
 import { PlayersContext } from "@/context/players.context";
 import { StatusContext } from "@/context/status.context";
 import { SupplyContext } from "@/context/supply.context";
@@ -39,6 +43,7 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
     currentPlayer,
     receiveResources,
     payResources,
+    payToPlayer,
     updatePlayer,
     nextPlayer,
   } = useContext(PlayersContext);
@@ -51,9 +56,8 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
   if (isGrass) {
     ownerColor = players[field.owner! - 1]?.color;
     nameKey =
-      field.building?.name
-        .replace(" ", "_")
-        .concat(`-${players[currentPlayer].id}`) || "";
+      field.building?.name.replace(" ", "_").concat(`-${currentPlayer.id}`) ||
+      "";
   }
 
   const getFieldImage = (type: ETerrains) =>
@@ -66,8 +70,7 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
   };
 
   const actionHandler = () => {
-    const player = players[currentPlayer];
-    const { id, workers, buildings } = player;
+    const { id, workers, buildings } = currentPlayer;
 
     const isSomethingToCollect =
       map.flat().filter((item) => !item.disabled).length - 1;
@@ -85,23 +88,69 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
         {
           switch (field.type) {
             case ETerrains.FORREST: {
-              const resource = { wood: 1 };
+              const resource: Partial<TResourcesOnly> = { wood: 1 };
               takeFromSupply(resource);
               receiveResources(resource);
               break;
             }
 
             case ETerrains.POND: {
-              const resource = { fish: 1 };
+              const resource: Partial<TResourcesOnly> = { fish: 1 };
               takeFromSupply(resource);
               receiveResources(resource);
               break;
             }
 
             case ETerrains.ROCKS: {
-              const resource = { stone: 1 };
+              const resource: Partial<TResourcesOnly> = { stone: 1 };
               takeFromSupply(resource);
               receiveResources(resource);
+              break;
+            }
+
+            case ETerrains.GRASS: {
+              if (field.building?.action) {
+                const buildingOwnerId = field.owner;
+                const { require, benefit } = field.building.action;
+                const { id: playerId, resources: playerResources } =
+                  currentPlayer;
+                const hasDifferentOwner =
+                  buildingOwnerId && buildingOwnerId !== playerId;
+
+                if (hasDifferentOwner) {
+                  const cost: Partial<TResourcesOnly> = { coin: 1 };
+                  const mergedCost = calculateResources(
+                    require || {},
+                    cost,
+                    (a, b) => a + b
+                  );
+
+                  if (!hasEnoughResources(playerResources, mergedCost)) {
+                    const costInfo = Object.entries(cost)
+                      .map((item) => item.reverse().join(" "))
+                      .join(" ");
+                    console.log(
+                      `Not enough resources to pay including the tax for the owner! Require additionaly - ${costInfo}`
+                    );
+                    return;
+                  }
+                  payToPlayer(cost, buildingOwnerId);
+                }
+
+                if (require) {
+                  if (!hasEnoughResources(playerResources, require)) {
+                    console.log(`Not enough resources!`);
+                    return;
+                  }
+                  payResources(require);
+                  restoreToSupply(convertToResourceOnly(require));
+                }
+
+                if (benefit) {
+                  takeFromSupply(convertToResourceOnly(benefit));
+                  receiveResources(benefit);
+                }
+              }
               break;
             }
 
@@ -123,7 +172,7 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
           buildings: buildings - 1,
         });
         payResources(cost);
-        restoreToSupply(cost);
+        restoreToSupply(convertToResourceOnly(cost));
         build(field, building, id);
         receiveResources({ point });
         removeBuilding(name);
