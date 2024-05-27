@@ -39,6 +39,7 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
     currentPlayer,
     receiveResources,
     payResources,
+    payToPlayer,
     updatePlayer,
     nextPlayer,
   } = useContext(PlayersContext);
@@ -51,9 +52,8 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
   if (isGrass) {
     ownerColor = players[field.owner! - 1]?.color;
     nameKey =
-      field.building?.name
-        .replace(" ", "_")
-        .concat(`-${players[currentPlayer].id}`) || "";
+      field.building?.name.replace(" ", "_").concat(`-${currentPlayer.id}`) ||
+      "";
   }
 
   const getFieldImage = (type: ETerrains) =>
@@ -66,8 +66,7 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
   };
 
   const actionHandler = () => {
-    const player = players[currentPlayer];
-    const { id, workers, buildings } = player;
+    const { id, workers, buildings } = currentPlayer;
 
     const isSomethingToCollect =
       map.flat().filter((item) => !item.disabled).length - 1;
@@ -102,6 +101,29 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
               const resource = { stone: 1 };
               takeFromSupply(resource);
               receiveResources(resource);
+              break;
+            }
+
+            case ETerrains.GRASS: {
+              if (field.building?.action) {
+                const buildingOwner = field.owner;
+                const { require, benefit } = field.building.action;
+
+                if (buildingOwner && buildingOwner !== currentPlayer.id) {
+                  const cost = { coin: 1 };
+                  payToPlayer(cost, buildingOwner);
+                }
+
+                if (require) {
+                  payResources(require);
+                  restoreToSupply(require);
+                }
+
+                if (benefit) {
+                  takeFromSupply(benefit);
+                  receiveResources(benefit);
+                }
+              }
               break;
             }
 

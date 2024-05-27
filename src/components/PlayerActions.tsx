@@ -10,12 +10,11 @@ const PlayerActions = () => {
   const { setStatus } = useContext(StatusContext);
   const { activateMapFields } = useContext(MapContext);
   const { buildings, setAvailableBuildings } = useContext(BuildingsContext);
-  const { currentPlayer, players } = useContext(PlayersContext);
+  const { currentPlayer } = useContext(PlayersContext);
 
-  const player = players[currentPlayer];
-  const haveEnoughBuildings = player.buildings > 0;
+  const haveEnoughBuildings = currentPlayer.buildings > 0;
   const possibleToBuild = !!buildings.filter((building) => {
-    const playerResources = player.resources;
+    const playerResources = currentPlayer.resources;
     const buildingCost = building.cost;
     return hasEnoughResources(playerResources, buildingCost);
   }).length;
@@ -27,7 +26,7 @@ const PlayerActions = () => {
 
   const buildHandler = () => {
     setStatus(EStatus.SELECT_BUILDING);
-    setAvailableBuildings(player);
+    setAvailableBuildings(currentPlayer);
   };
 
   return (
