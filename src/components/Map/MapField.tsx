@@ -5,7 +5,7 @@ import classNames from "classnames";
 import { EStatus } from "@/shared/enums/status.enum";
 import { ETerrains } from "@/shared/enums/terrains.enum";
 import { TField } from "@/shared/types/map.type";
-import { TResourcesOnly } from "@/shared/types/resources.type";
+import { TResourcesAll, TResourcesOnly } from "@/shared/types/resources.type";
 import { hasEnoughResources } from "@/shared/helpers/hasEnoughResources";
 import { convertToResourceOnly } from "@/shared/helpers/convertToResourceOnly";
 import { calculateResources } from "@/shared/helpers/calculateResources";
@@ -14,12 +14,14 @@ import { PlayersContext } from "@/context/players.context";
 import { StatusContext } from "@/context/status.context";
 import { SupplyContext } from "@/context/supply.context";
 import { BuildingsContext } from "@/context/buildings.context";
+import { ToastContext } from "@/context/toast.context";
 import Building from "@/components/Building/Building";
 
 import ImgForrest from "@/assets/map/forrest.svg";
 import ImgPond from "@/assets/map/pond.svg";
 import ImgRocks from "@/assets/map/rocks.svg";
 import ImgWorker from "@/assets/user.svg";
+import { ERequestStatus } from "@/shared/enums/requestStatus.enum";
 
 const fieldImages: Record<ETerrains, string | null> = {
   forrest: ImgForrest,
@@ -34,10 +36,11 @@ const classes = {
 
 const MapField: React.FC<{ field: TField }> = ({ field }) => {
   const { selectedBuilding, removeBuilding } = useContext(BuildingsContext);
-  const { takeFromSupply, restoreToSupply } = useContext(SupplyContext);
+  const { supply, takeFromSupply, restoreToSupply } = useContext(SupplyContext);
   const { status, setStatus } = useContext(StatusContext);
   const { map, sendWorker, activateMapFields, disableMapField, build } =
     useContext(MapContext);
+  const { showToast } = useContext(ToastContext);
   const {
     players,
     currentPlayer,
@@ -59,6 +62,35 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
       field.building?.name.replace(" ", "_").concat(`-${currentPlayer.id}`) ||
       "";
   }
+
+  const collectAvailableResources = (resources: Partial<TResourcesAll>) => {
+    const calculatedResources = calculateResources(
+      supply,
+      resources,
+      (a, b) => a - b
+    );
+    const missingResources = Object.fromEntries(
+      Object.entries(calculatedResources).filter(
+        ([key, value]) => key && value < 0
+      )
+    );
+
+    if (Object.entries(missingResources).length) {
+      const resourcesToTake = calculateResources(
+        resources,
+        missingResources,
+        (a, b) => a + b
+      );
+      takeFromSupply(convertToResourceOnly(resourcesToTake));
+      receiveResources(resourcesToTake);
+      showToast(ERequestStatus.WARNING, "Not enough resources in supply!");
+      return;
+    }
+
+    takeFromSupply(convertToResourceOnly(resources));
+    receiveResources(resources);
+    showToast(ERequestStatus.SUCCESS, "Successfully collected!");
+  };
 
   const getFieldImage = (type: ETerrains) =>
     isGrass ? null : <ReactSVG src={fieldImages[type]!} />;
@@ -89,22 +121,19 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
           switch (field.type) {
             case ETerrains.FORREST: {
               const resource: Partial<TResourcesOnly> = { wood: 1 };
-              takeFromSupply(resource);
-              receiveResources(resource);
+              collectAvailableResources(resource);
               break;
             }
 
             case ETerrains.POND: {
               const resource: Partial<TResourcesOnly> = { fish: 1 };
-              takeFromSupply(resource);
-              receiveResources(resource);
+              collectAvailableResources(resource);
               break;
             }
 
             case ETerrains.ROCKS: {
               const resource: Partial<TResourcesOnly> = { stone: 1 };
-              takeFromSupply(resource);
-              receiveResources(resource);
+              collectAvailableResources(resource);
               break;
             }
 
@@ -129,8 +158,10 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
                     const costInfo = Object.entries(cost)
                       .map((item) => item.reverse().join(" "))
                       .join(" ");
-                    console.log(
-                      `Not enough resources to pay including the tax for the owner! Require additionaly - ${costInfo}`
+
+                    showToast(
+                      ERequestStatus.ERROR,
+                      `Not enough resources to pay including the tax for the owner! Require additionally - ${costInfo}`
                     );
                     return;
                   }
@@ -139,7 +170,10 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
 
                 if (require) {
                   if (!hasEnoughResources(playerResources, require)) {
-                    console.log(`Not enough resources!`);
+                    showToast(
+                      ERequestStatus.ERROR,
+                      "You don't have enough resources!"
+                    );
                     return;
                   }
                   payResources(require);
@@ -147,8 +181,7 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
                 }
 
                 if (benefit) {
-                  takeFromSupply(convertToResourceOnly(benefit));
-                  receiveResources(benefit);
+                  collectAvailableResources(benefit);
                 }
               }
               break;

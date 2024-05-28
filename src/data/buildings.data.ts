@@ -20,11 +20,11 @@ export const DBuildingsRecommended = [
 export const DSpecialBuildings = [
   EBuildings.CASTLE,
   EBuildings.CATHEDRAL,
-  EBuildings.LOMBARD,
-  EBuildings.CASTLE,
   EBuildings.RESIDENCE,
   EBuildings.WATCHTOWER,
 ];
+
+export const DWithoutBenefitBuildings = [EBuildings.STATUE];
 
 export const DBuildings: TBuilding[] = [
   {

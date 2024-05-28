@@ -1,13 +1,7 @@
-import { EResources } from "@/shared/enums/resources.enum";
-import { TResourcesAll } from "@/shared/types/resources.type";
-
-export const hasEnoughResources = (
-  playerResources: TResourcesAll,
-  cost: Partial<TResourcesAll>
-) => {
-  for (const resource in cost) {
-    const resourceKey = resource as EResources;
-    if (playerResources[resourceKey] < cost[resourceKey]!) {
+export const hasEnoughResources = <T>(primary: T, secondary: Partial<T>) => {
+  for (const resource in secondary) {
+    const resourceKey = resource as keyof T;
+    if (primary[resourceKey] < secondary[resourceKey]!) {
       return false;
     }
   }
