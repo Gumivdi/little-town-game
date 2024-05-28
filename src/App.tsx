@@ -1,13 +1,16 @@
 import { useContext } from "react";
 import { PlayersContext } from "@/context/players.context";
+import { ToastContext } from "@/context/toast.context";
 import BuildingsStore from "@/components/BuildingsStore";
 import Players from "@/components/Players";
 import Supply from "@/components/Supply";
 import DevelopmentActions from "@/components/DevelopmentActions";
 import MapArea from "@/components/MapArea";
+import Toast from "@/components/Toast/Toast";
 
 function App() {
   const { players } = useContext(PlayersContext);
+  const { type: toastType, message: toastMessage } = useContext(ToastContext);
 
   const developmentMode = true;
   const classes = {
@@ -37,6 +40,7 @@ function App() {
         )}
       </section>
       <MapArea className={classes.map} />
+      {!!toastType && <Toast type={toastType} message={toastMessage} />}
     </main>
   );
 }

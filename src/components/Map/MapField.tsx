@@ -14,12 +14,14 @@ import { PlayersContext } from "@/context/players.context";
 import { StatusContext } from "@/context/status.context";
 import { SupplyContext } from "@/context/supply.context";
 import { BuildingsContext } from "@/context/buildings.context";
+import { ToastContext } from "@/context/toast.context";
 import Building from "@/components/Building/Building";
 
 import ImgForrest from "@/assets/map/forrest.svg";
 import ImgPond from "@/assets/map/pond.svg";
 import ImgRocks from "@/assets/map/rocks.svg";
 import ImgWorker from "@/assets/user.svg";
+import { ERequestStatus } from "@/shared/enums/requestStatus.enum";
 
 const fieldImages: Record<ETerrains, string | null> = {
   forrest: ImgForrest,
@@ -38,6 +40,7 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
   const { status, setStatus } = useContext(StatusContext);
   const { map, sendWorker, activateMapFields, disableMapField, build } =
     useContext(MapContext);
+  const { showToast } = useContext(ToastContext);
   const {
     players,
     currentPlayer,
@@ -129,7 +132,9 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
                     const costInfo = Object.entries(cost)
                       .map((item) => item.reverse().join(" "))
                       .join(" ");
-                    console.log(
+
+                    showToast(
+                      ERequestStatus.ERROR,
                       `Not enough resources to pay including the tax for the owner! Require additionaly - ${costInfo}`
                     );
                     return;
@@ -139,7 +144,7 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
 
                 if (require) {
                   if (!hasEnoughResources(playerResources, require)) {
-                    console.log(`Not enough resources!`);
+                    showToast(ERequestStatus.ERROR, "Not enough resources!");
                     return;
                   }
                   payResources(require);
