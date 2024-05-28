@@ -8,6 +8,7 @@ import { PlayersProvider } from "@/context/players.context.tsx";
 import { MapProvider } from "@/context/map.context.tsx";
 import { StatusProvider } from "@/context/status.context.tsx";
 import { BuildingsProvider } from "@/context/buildings.context.tsx";
+import { ToastProvider } from "@/context/toast.context.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -16,7 +17,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <PlayersProvider>
           <MapProvider>
             <BuildingsProvider>
-              <App />
+              <ToastProvider>
+                <App />
+              </ToastProvider>
             </BuildingsProvider>
           </MapProvider>
         </PlayersProvider>
