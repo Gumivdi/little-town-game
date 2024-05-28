@@ -6,6 +6,10 @@ import { updateMapField } from "@/shared/helpers/updateMapField";
 import { updateMapFields } from "@/shared/helpers/updateMapFields";
 import { getFieldCoordinates } from "@/shared/helpers/getFieldCoordinates";
 import { TBuilding } from "@/shared/types/building.type";
+import {
+  DSpecialBuildings,
+  DWithoutBenefitBuildings,
+} from "@/data/buildings.data";
 
 type TContext = {
   map: TMap | [];
@@ -85,10 +89,22 @@ const reducer: Reducer<TReducer, TReducerActions> = (
           (item) => item > -1 && item < +mapCols
         );
 
+        const isBuildingNameInArray = (field: TField, array: unknown[]) =>
+          field.type === ETerrains.GRASS &&
+          !!field.building &&
+          array.includes(field.building.name);
+
         for (const fieldRow of avaliableRows) {
           for (const fieldCol of avaliableCols) {
             const nearbyFieldId = `${fieldRow}-${fieldCol}-${mapRows}-${mapCols}`;
-            if (nearbyFieldId === fieldId) continue;
+            const field = state.map[fieldRow][fieldCol];
+            const isCurrentField = nearbyFieldId === fieldId;
+            if (
+              isCurrentField ||
+              isBuildingNameInArray(field, DSpecialBuildings) ||
+              isBuildingNameInArray(field, DWithoutBenefitBuildings)
+            )
+              continue;
             nearbyFields.push(nearbyFieldId);
           }
         }
