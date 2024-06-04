@@ -23,6 +23,7 @@ type TContext = {
     playerId?: number
   ) => void;
   updatePlayer: (id: number, data: Partial<TPlayer>) => void;
+  preparePlayersToNextRound: (startingWorkers: number, round: number) => void;
 };
 
 type TReducer = {
@@ -34,6 +35,10 @@ type TReducerActions =
   | {
       type: "PAY";
       payload: { playerId: number; resources: Partial<TResourcesAll> };
+    }
+  | {
+      type: "PREPARE_TO_NEXT_ROUND";
+      payload: number;
     }
   | {
       type: "RECEIVE";
@@ -50,6 +55,7 @@ export const PlayersContext = createContext<TContext>({
   payToPlayer: () => {},
   receiveResources: () => {},
   updatePlayer: () => {},
+  preparePlayersToNextRound: () => {},
 });
 
 const reducer: Reducer<TReducer, TReducerActions> = (
@@ -127,6 +133,17 @@ const reducer: Reducer<TReducer, TReducerActions> = (
       };
     }
 
+    case "PREPARE_TO_NEXT_ROUND": {
+      const playersState = [...state.players];
+      return {
+        ...state,
+        players: playersState.map((player) => ({
+          ...player,
+          workers: payload,
+        })),
+      };
+    }
+
     default:
       return state;
   }
@@ -181,6 +198,17 @@ export const PlayersProvider: FC<{ children: ReactNode }> = ({ children }) => {
     });
   };
 
+  const preparePlayersToNextRound = (
+    startingWorkers: number,
+    round: number
+  ) => {
+    dispatch({
+      type: "PREPARE_TO_NEXT_ROUND",
+      payload: startingWorkers,
+    });
+    setCurrentPlayerIndex((round - 1) % state.players.length);
+  };
+
   const context = {
     ...state,
     currentPlayer,
@@ -190,6 +218,7 @@ export const PlayersProvider: FC<{ children: ReactNode }> = ({ children }) => {
     payToPlayer,
     receiveResources,
     updatePlayer,
+    preparePlayersToNextRound,
   };
 
   return (

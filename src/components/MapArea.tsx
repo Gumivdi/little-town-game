@@ -1,4 +1,5 @@
 import { useContext } from "react";
+import { DSetup } from "@/data/setup.data";
 import { EStatus } from "@/shared/enums/status.enum";
 import { PlayersContext } from "@/context/players.context";
 import { StatusContext } from "@/context/status.context";
@@ -8,14 +9,45 @@ import Map from "@/components/Map/Map";
 import PlayerActions from "@/components/PlayerActions";
 
 const MapArea: React.FC<{ className?: string }> = ({ className }) => {
-  const { activateMapFields } = useContext(MapContext);
-  const { players, nextPlayer } = useContext(PlayersContext);
-  const { status, setStatus } = useContext(StatusContext);
+  const { activateMapFields, cleanupMapWorkers } = useContext(MapContext);
+  const { players, nextPlayer, preparePlayersToNextRound } =
+    useContext(PlayersContext);
+  const { status, round, setStatus, setRound } = useContext(StatusContext);
 
   const finishAction = () => {
+    const anyPlayerHaveWorker = players.filter(
+      (player) => player.workers
+    ).length;
+
     nextPlayer();
     setStatus(EStatus.SELECT_ACTION);
     activateMapFields(EStatus.SELECT_ACTION);
+
+    if (!anyPlayerHaveWorker) {
+      const nextRound = round + 1;
+      const startingWorkers = DSetup[players.length - 2].workers;
+
+      if (round === 4) {
+        const playersScore = players.map((item) => item.resources.point);
+        const winnerScore = Math.max(...playersScore);
+        const winner = players.filter(
+          (player) => player.resources.point === winnerScore
+        );
+        winner.length > 1
+          ? console.log(
+              `It looks like there is no winner because more than one player has the same amount of points`
+            )
+          : console.log(
+              `Game over! The winner is ${winner[0]?.name}! Congratulations!`
+            );
+
+        return;
+      }
+
+      cleanupMapWorkers();
+      setRound(nextRound);
+      preparePlayersToNextRound(startingWorkers, nextRound);
+    }
   };
 
   return (
