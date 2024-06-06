@@ -18,6 +18,7 @@ type TContext = {
   disableMapField: (fieldId: string) => void;
   initMap: (map: TMap) => void;
   sendWorker: (playerId: number, field: TField) => void;
+  cleanupMapWorkers: () => void;
 };
 
 type TReducer = {
@@ -33,6 +34,7 @@ type TReducerActions =
       type: "BUILD";
       payload: { field: TField; building: TBuilding; playerId: number };
     }
+  | { type: "CLEANUP_WORKERS"; payload: null }
   | { type: "DISABLE_MAP_FIELD"; payload: string }
   | { type: "INIT"; payload: TMap }
   | { type: "SEND_WORKER"; payload: { playerId: number; field: TField } };
@@ -44,6 +46,7 @@ export const MapContext = createContext<TContext>({
   disableMapField: () => {},
   initMap: () => {},
   sendWorker: () => {},
+  cleanupMapWorkers: () => {},
 });
 
 const reducer: Reducer<TReducer, TReducerActions> = (
@@ -137,6 +140,22 @@ const reducer: Reducer<TReducer, TReducerActions> = (
       };
     }
 
+    case "CLEANUP_WORKERS": {
+      return {
+        ...state,
+        map: updateMapFields(state.map, (_, { colItem }) => {
+          const isGrass = colItem.type === ETerrains.GRASS;
+          const haveOwner = isGrass && !!colItem.owner;
+          const haveNotBuilding = haveOwner && !colItem.building;
+          return isGrass && haveOwner && haveNotBuilding
+            ? {
+                owner: null,
+              }
+            : colItem;
+        }),
+      };
+    }
+
     case "DISABLE_MAP_FIELD": {
       return {
         ...state,
@@ -200,6 +219,10 @@ export const MapProvider: FC<{ children: ReactNode }> = ({ children }) => {
     dispatch({ type: "SEND_WORKER", payload: { playerId, field } });
   };
 
+  const cleanupMapWorkers = () => {
+    dispatch({ type: "CLEANUP_WORKERS", payload: null });
+  };
+
   const context = {
     ...state,
     activateMapFields,
@@ -207,6 +230,7 @@ export const MapProvider: FC<{ children: ReactNode }> = ({ children }) => {
     disableMapField,
     initMap,
     sendWorker,
+    cleanupMapWorkers,
   };
   return <MapContext.Provider value={context}>{children}</MapContext.Provider>;
 };

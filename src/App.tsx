@@ -7,6 +7,7 @@ import Supply from "@/components/Supply";
 import DevelopmentActions from "@/components/DevelopmentActions";
 import MapArea from "@/components/MapArea";
 import Toast from "@/components/Toast/Toast";
+import RoundCounter from "@/components/RoundCounter";
 
 function App() {
   const { players } = useContext(PlayersContext);
@@ -31,7 +32,10 @@ function App() {
         {developmentMode && <DevelopmentActions />}
         {!!players.length && (
           <>
-            <Supply />
+            <div className="flex justify-between items-center">
+              <Supply />
+              <RoundCounter />
+            </div>
             <Players />
             <div className={classes.store}>
               <BuildingsStore />
