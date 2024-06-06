@@ -22,6 +22,7 @@ import ImgPond from "@/assets/map/pond.svg";
 import ImgRocks from "@/assets/map/rocks.svg";
 import ImgWorker from "@/assets/user.svg";
 import { ERequestStatus } from "@/shared/enums/requestStatus.enum";
+import { verifyEndRound } from "@/shared/helpers/verifyEndRound";
 
 const fieldImages: Record<ETerrains, string | null> = {
   forrest: ImgForrest,
@@ -37,9 +38,15 @@ const classes = {
 const MapField: React.FC<{ field: TField }> = ({ field }) => {
   const { selectedBuilding, removeBuilding } = useContext(BuildingsContext);
   const { supply, takeFromSupply, restoreToSupply } = useContext(SupplyContext);
-  const { status, setStatus } = useContext(StatusContext);
-  const { map, sendWorker, activateMapFields, disableMapField, build } =
-    useContext(MapContext);
+  const { round, status, setStatus, setRound } = useContext(StatusContext);
+  const {
+    map,
+    sendWorker,
+    activateMapFields,
+    disableMapField,
+    build,
+    cleanupMapWorkers,
+  } = useContext(MapContext);
   const { showToast } = useContext(ToastContext);
   const {
     players,
@@ -49,6 +56,7 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
     payToPlayer,
     updatePlayer,
     nextPlayer,
+    preparePlayersToNextRound,
   } = useContext(PlayersContext);
 
   let ownerColor = "";
@@ -99,6 +107,22 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
     setStatus(EStatus.SELECT_ACTION);
     activateMapFields(EStatus.SELECT_ACTION);
     nextPlayer();
+    verifyEndRound(players, round, {
+      prepareNextRound: (nextRound, startingWorkers) => {
+        cleanupMapWorkers();
+        setRound(nextRound);
+        preparePlayersToNextRound(startingWorkers, nextRound);
+        showToast(ERequestStatus.WARNING, `Round ${nextRound}/4`);
+      },
+      draw: () => {
+        console.log(
+          `It looks like there is no winner because more than one player has the same amount of points`
+        );
+      },
+      win: ({ name }) => {
+        console.log(`Game over! The winner is ${name}! Congratulations!`);
+      },
+    });
   };
 
   const actionHandler = () => {

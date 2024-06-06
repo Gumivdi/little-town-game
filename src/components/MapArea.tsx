@@ -1,53 +1,43 @@
 import { useContext } from "react";
-import { DSetup } from "@/data/setup.data";
 import { EStatus } from "@/shared/enums/status.enum";
+import { verifyEndRound } from "@/shared/helpers/verifyEndRound";
 import { PlayersContext } from "@/context/players.context";
 import { StatusContext } from "@/context/status.context";
 import { MapContext } from "@/context/map.context";
 import InfoBar from "@/components/InfoBar";
 import Map from "@/components/Map/Map";
 import PlayerActions from "@/components/PlayerActions";
+import { ToastContext } from "@/context/toast.context";
+import { ERequestStatus } from "@/shared/enums/requestStatus.enum";
 
 const MapArea: React.FC<{ className?: string }> = ({ className }) => {
   const { activateMapFields, cleanupMapWorkers } = useContext(MapContext);
   const { players, nextPlayer, preparePlayersToNextRound } =
     useContext(PlayersContext);
   const { status, round, setStatus, setRound } = useContext(StatusContext);
+  const { showToast } = useContext(ToastContext);
 
   const finishAction = () => {
-    const anyPlayerHaveWorker = players.filter(
-      (player) => player.workers
-    ).length;
-
     nextPlayer();
     setStatus(EStatus.SELECT_ACTION);
     activateMapFields(EStatus.SELECT_ACTION);
 
-    if (!anyPlayerHaveWorker) {
-      const nextRound = round + 1;
-      const startingWorkers = DSetup[players.length - 2].workers;
-
-      if (round === 4) {
-        const playersScore = players.map((item) => item.resources.point);
-        const winnerScore = Math.max(...playersScore);
-        const winner = players.filter(
-          (player) => player.resources.point === winnerScore
+    verifyEndRound(players, round, {
+      prepareNextRound: (nextRound, startingWorkers) => {
+        cleanupMapWorkers();
+        setRound(nextRound);
+        preparePlayersToNextRound(startingWorkers, nextRound);
+        showToast(ERequestStatus.WARNING, `Round ${nextRound}/4`);
+      },
+      draw: () => {
+        console.log(
+          `It looks like there is no winner because more than one player has the same amount of points`
         );
-        winner.length > 1
-          ? console.log(
-              `It looks like there is no winner because more than one player has the same amount of points`
-            )
-          : console.log(
-              `Game over! The winner is ${winner[0]?.name}! Congratulations!`
-            );
-
-        return;
-      }
-
-      cleanupMapWorkers();
-      setRound(nextRound);
-      preparePlayersToNextRound(startingWorkers, nextRound);
-    }
+      },
+      win: ({ name }) => {
+        console.log(`Game over! The winner is ${name}! Congratulations!`);
+      },
+    });
   };
 
   return (
