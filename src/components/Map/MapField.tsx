@@ -72,10 +72,8 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
   }
 
   const collectAvailableResources = (resources: Partial<TResourcesAll>) => {
-    const calculatedResources = calculateResources(
-      supply,
-      resources,
-      (a, b) => a - b
+    const calculatedResources = convertToResourceOnly(
+      calculateResources(supply, resources, (a, b) => a - b)
     );
     const missingResources = Object.fromEntries(
       Object.entries(calculatedResources).filter(
@@ -115,12 +113,16 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
         showToast(ERequestStatus.WARNING, `Round ${nextRound}/4`);
       },
       draw: () => {
-        console.log(
+        showToast(
+          ERequestStatus.WARNING,
           `It looks like there is no winner because more than one player has the same amount of points`
         );
       },
       win: ({ name }) => {
-        console.log(`Game over! The winner is ${name}! Congratulations!`);
+        showToast(
+          ERequestStatus.SUCCESS,
+          `Game over! The winner is ${name}! Congratulations!`
+        );
       },
     });
   };
