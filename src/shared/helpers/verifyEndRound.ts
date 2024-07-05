@@ -10,7 +10,9 @@ export const verifyEndRound = (
     win: (winner: TPlayer) => void;
   }
 ) => {
-  const anyPlayerHaveWorker = players.filter((player) => player.workers).length;
+  const anyPlayerHaveWorker = players.filter(
+    (player) => player.workers > 0
+  ).length;
   const { prepareNextRound, draw, win } = scenarios;
 
   if (!anyPlayerHaveWorker) {
