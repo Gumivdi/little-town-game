@@ -1,9 +1,10 @@
 import { useContext, useState } from "react";
 import { PlayersContext } from "@/context/players.context";
 import { SupplyContext } from "@/context/supply.context";
-import { EResources } from "@/shared/enums/resources.enum";
 import { ToastContext } from "@/context/toast.context";
+import { EResources } from "@/shared/enums/resources.enum";
 import { ERequestStatus } from "@/shared/enums/requestStatus.enum";
+import { TResources, TResourcesOnly } from "@/shared/types/resources.type";
 import Resource from "@/components/Resource/Resource";
 
 export interface ModalProps {
@@ -12,66 +13,54 @@ export interface ModalProps {
 }
 
 const ModalExchange: React.FC<ModalProps> = ({ isOpen, onClose }) => {
-  const { currentPlayer } = useContext(PlayersContext);
-  const { supply } = useContext(SupplyContext);
+  const { currentPlayer, receiveResources, payResources } = useContext(PlayersContext);
+  const { supply, takeFromSupply, restoreToSupply } = useContext(SupplyContext);
   const { showToast } = useContext(ToastContext);
 
-  const [resourceAmounts, setResourceAmounts] = useState(
+  const [resourceAmounts, setResourceAmounts] = useState<Partial<TResourcesOnly>>(
     Object.fromEntries(Object.keys(supply).map((key) => [key, 0]))
   );
 
-  const resources = Object.keys(supply)
-    .filter((key): key is EResources => key !== EResources.COIN)
-    .map((key) => key as EResources);
-
   if (!isOpen) return null;
 
-  const maxAffordableAmount = Math.floor(currentPlayer.resources.coin / 3);
+  const resources = Object.keys(supply) as TResources[];
+  const resourceCost = 3;
+
+  const calculateMaxResourceAmount = (resourceName: TResources) => {
+    const available = supply[resourceName] ?? 0;
+    const maxAffordableAmount = Math.floor(currentPlayer.resources.coin / resourceCost);
+    return Math.min(available, maxAffordableAmount);
+  }
+
+  const calculateCost = (resources: Partial<TResourcesOnly>, cost = resourceCost) => Object.values(resources).reduce(
+    (total, amount) => total + amount,
+    0
+  ) * cost;
 
   const handleSliderChange = (resourceName: EResources, value: number) => {
     setResourceAmounts((prevState) => {
       const updatedResources = { ...prevState, [resourceName]: value };
-      const totalCoinsSpent = Object.values(updatedResources).reduce(
-        (total, amount) => total + amount,
-        0
-      );
-
-      if (totalCoinsSpent > currentPlayer.resources.coin / 3) {
-        return prevState;
-      }
-
-      return updatedResources;
+      const notEnoughCoins = calculateCost(updatedResources) > currentPlayer.resources.coin;
+      return notEnoughCoins ? prevState : updatedResources;
     });
   };
 
   const handleSubmit = () => {
-    const totalCoinsSpent = Object.values(resourceAmounts).reduce(
-      (total, amount) => total + amount,
-      0
-    );
-
-    const totalCost = totalCoinsSpent * 3;
-
-    if (totalCost > currentPlayer.resources.coin) {
-      showToast(ERequestStatus.ERROR, "You don't have enough coins!");
-      return;
-    }
+    const totalCost = calculateCost(resourceAmounts);
+    payResources({ coin: totalCost });
+    receiveResources(resourceAmounts);
+    restoreToSupply({ coin: totalCost });
+    takeFromSupply(resourceAmounts);
 
     showToast(
       ERequestStatus.SUCCESS,
-      `Exchange completed successfully: ${resourceAmounts}`
+      `Exchange completed successfully!`
     );
 
     onClose();
   };
 
   const handleCancel = () => {
-    // setResourceAmounts(
-    //   resources.reduce((acc, resource) => {
-    //     acc[resource.name] = 0;
-    //     return acc;
-    //   }, {})
-    // );
     onClose();
   };
 
@@ -87,73 +76,62 @@ const ModalExchange: React.FC<ModalProps> = ({ isOpen, onClose }) => {
         <h2 className="text-xl font-semibold mb-4">Resources exchange</h2>
         <div className="mb-4">
           <p className="text-sm mb-4 flex gap-1 items-center">
-            Each resource cost 3 <Resource size={4} type={EResources.COIN} />.
+            Each resource cost {resourceCost} <Resource size={4} type={EResources.COIN} />.
           </p>
         </div>
-        {resources.map((resource) => (
-          <div key={resource} className="mb-4">
-            <div className="flex justify-between items-center">
-              <Resource size={4} type={resource} />
-              <span>{resourceAmounts[resource]} pieces</span>
+        {resources.map((resource) => {
+          if (resource === EResources.COIN) return null;
+
+          const coinsSpent = calculateCost(resourceAmounts);
+          const coinsLeft = currentPlayer.resources.coin - coinsSpent;
+          const isInsufficientCoins = coinsLeft < resourceCost && resourceAmounts[resource] === 0;
+          const isResourceUnavailable = supply[resource] === 0;
+          const isDisabled = isInsufficientCoins || isResourceUnavailable;
+
+          const inputProps = {
+            type: "range",
+            min: 0,
+            max: calculateMaxResourceAmount(resource),
+            step: 1,
+            disabled: isDisabled,
+            value: resourceAmounts[resource],
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
+              handleSliderChange(resource, parseInt(e.target.value)),
+            className: "w-full",
+          };
+
+          return (
+            <div key={resource} className="mb-4">
+              <div className="flex justify-between items-center">
+                <Resource size={4} type={resource} />
+                <span>{resourceAmounts[resource]}/{supply[resource]} pieces</span>
+              </div>
+              <input {...inputProps} />
             </div>
-            <input
-              type="range"
-              min="0"
-              max={maxAffordableAmount}
-              step="1"
-              disabled={
-                currentPlayer.resources.coin -
-                  Object.values(resourceAmounts).reduce(
-                    (total, amount) => total + amount,
-                    0
-                  ) *
-                    3 <
-                  3 && resourceAmounts[resource] === 0
-              }
-              value={resourceAmounts[resource]}
-              onChange={(e) =>
-                handleSliderChange(resource, parseInt(e.target.value))
-              }
-              className="w-full"
-            />
-          </div>
-        ))}
+          );
+        })}
         <div className="flex justify-between items-center">
           <p className="flex gap-1 items-center">
             Coins to spent:{" "}
-            {Object.values(resourceAmounts).reduce(
-              (total, amount) => total + amount,
-              0
-            ) * 3}
+            {calculateCost(resourceAmounts)}
             <Resource size={4} type={EResources.COIN} />
           </p>
           <p className="flex gap-1 items-center">
             Coins left:{" "}
-            {currentPlayer.resources.coin -
-              Object.values(resourceAmounts).reduce(
-                (total, amount) => total + amount,
-                0
-              ) *
-                3}
+            {currentPlayer.resources.coin - calculateCost(resourceAmounts)}
             <Resource size={4} type={EResources.COIN} />
           </p>
         </div>
         <div className="mt-6 flex justify-end space-x-4">
           <button
             onClick={handleCancel}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg"
+            className="w-1/2 px-4 py-2 bg-red-600 text-white rounded-lg"
           >
             Cancel
           </button>
           <button
-            onClick={handleCancel}
-            className="px-4 py-2 bg-gray-300 text-black rounded-lg"
-          >
-            Reset
-          </button>
-          <button
             onClick={handleSubmit}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg"
+            className="w-1/2 px-4 py-2 bg-blue-500 text-white rounded-lg"
           >
             Exchange
           </button>

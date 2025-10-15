@@ -1,11 +1,11 @@
 import { EResources } from "@/shared/enums/resources.enum";
 
-type TMaterial = EResources.WOOD | EResources.STONE;
-type TFood = EResources.WHEAT | EResources.FISH;
-type TValue = EResources.COIN;
-type TScore = EResources.POINT;
-type TResources = TMaterial | TFood | TValue;
-type TAll = TResources | TScore;
+export type TMaterial = EResources.WOOD | EResources.STONE;
+export type TFood = EResources.WHEAT | EResources.FISH;
+export type TValue = EResources.COIN;
+export type TScore = EResources.POINT;
+export type TResources = TMaterial | TFood | TValue;
+export type TAll = TResources | TScore;
 
 export type TResourcesMaterial = Record<TMaterial, number>;
 export type TResourcesValue = Record<TValue, number>;

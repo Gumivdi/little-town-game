@@ -54,7 +54,7 @@ const PlayerActions = () => {
       >
         Build
       </button>
-      <ModalExchange isOpen={isModalOpen} onClose={closeModal} />
+      {isModalOpen && <ModalExchange isOpen={isModalOpen} onClose={closeModal} />}
     </>
   );
 };
