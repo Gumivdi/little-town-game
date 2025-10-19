@@ -257,7 +257,7 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
     >
       {isOwnerWithoutBuilding && (
         <ReactSVG
-          className={`size-8 text-${ownerColor}-600 mx-auto`}
+          className={`size-8 text-${ownerColor}-600 mx-auto drop-shadow-[0_2px_0_rgba(0,0,0,0.8)]`}
           src={ImgWorker}
         />
       )}
