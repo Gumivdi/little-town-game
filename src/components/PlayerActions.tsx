@@ -13,9 +13,9 @@ const PlayerActions = () => {
   const { buildings, setAvailableBuildings } = useContext(BuildingsContext);
   const { currentPlayer } = useContext(PlayersContext);
 
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isExchangeModalOpen, setIsExchangeModalOpen] = useState<boolean>(false);
 
-  const closeModal = () => setIsModalOpen(false);
+  const closeModal = () => setIsExchangeModalOpen(false);
 
   const haveEnoughBuildings = currentPlayer.buildings > 0;
   const possibleToBuild = !!buildings.filter((building) => {
@@ -23,6 +23,7 @@ const PlayerActions = () => {
     const buildingCost = building.cost;
     return hasEnoughResources(playerResources, buildingCost);
   }).length;
+  const possibleToExchange = currentPlayer.resources.coin >= 3;
 
   const sendWorkerHandler = () => {
     setStatus(EStatus.SEND_WORKER);
@@ -35,13 +36,16 @@ const PlayerActions = () => {
   };
 
   const exchangeHandler = () => {
-    // open exchange modal
-    setIsModalOpen(true);
+    setIsExchangeModalOpen(true);
   };
 
   return (
     <>
-      <button className="bg-black p-3 shrink-0" onClick={exchangeHandler}>
+      <button 
+        className="bg-black p-3 shrink-0"
+        disabled={!possibleToExchange}
+        onClick={exchangeHandler}
+      >
         Exchange coins
       </button>
       <button className="bg-black p-3 shrink-0" onClick={sendWorkerHandler}>
@@ -54,7 +58,7 @@ const PlayerActions = () => {
       >
         Build
       </button>
-      {isModalOpen && <ModalExchange isOpen={isModalOpen} onClose={closeModal} />}
+      {isExchangeModalOpen && <ModalExchange isOpen={isExchangeModalOpen} onClose={closeModal} />}
     </>
   );
 };
