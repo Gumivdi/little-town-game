@@ -1,21 +1,16 @@
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { EStatus } from "@/shared/enums/status.enum";
 import { StatusContext } from "@/context/status.context";
 import { MapContext } from "@/context/map.context";
 import { BuildingsContext } from "@/context/buildings.context";
 import { PlayersContext } from "@/context/players.context";
 import { hasEnoughResources } from "@/shared/helpers/hasEnoughResources";
-import ModalExchange from "@/components/Modal/ModalExchange";
 
 const PlayerActions = () => {
   const { setStatus } = useContext(StatusContext);
   const { activateMapFields } = useContext(MapContext);
   const { buildings, setAvailableBuildings } = useContext(BuildingsContext);
   const { currentPlayer } = useContext(PlayersContext);
-
-  const [isExchangeModalOpen, setIsExchangeModalOpen] = useState<boolean>(false);
-
-  const closeModal = () => setIsExchangeModalOpen(false);
 
   const haveEnoughBuildings = currentPlayer.buildings > 0;
   const possibleToBuild = !!buildings.filter((building) => {
@@ -36,7 +31,7 @@ const PlayerActions = () => {
   };
 
   const exchangeHandler = () => {
-    setIsExchangeModalOpen(true);
+    setStatus(EStatus.EXCHANGE);
   };
 
   return (
@@ -58,7 +53,6 @@ const PlayerActions = () => {
       >
         Build
       </button>
-      {isExchangeModalOpen && <ModalExchange isOpen={isExchangeModalOpen} onClose={closeModal} />}
     </>
   );
 };

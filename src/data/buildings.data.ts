@@ -197,12 +197,10 @@ export const DBuildings: TBuilding[] = [
     cost: {
       wood: 3,
     },
-    special: {
-      stage: EStage.ACTION,
-      score() {
-        // TODO -> Exchange 2 cubic resources into 2 different of your choice
-      },
-    },
+    action: {
+      require: {},
+      benefit: {}
+    }
   },
 
   {

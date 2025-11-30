@@ -1,7 +1,7 @@
 import { FC, ReactNode, Reducer, createContext, useReducer } from "react";
 import { EStatus } from "@/shared/enums/status.enum";
 import { ETerrains } from "@/shared/enums/terrains.enum";
-import { TField, TMap } from "@/shared/types/map.type";
+import { TBuildArea, TField, TMap } from "@/shared/types/map.type";
 import { updateMapField } from "@/shared/helpers/updateMapField";
 import { updateMapFields } from "@/shared/helpers/updateMapFields";
 import { getFieldCoordinates } from "@/shared/helpers/getFieldCoordinates";
@@ -13,16 +13,19 @@ import {
 
 type TContext = {
   map: TMap | [];
+  memorizedField: TBuildArea | null;
   activateMapFields: (status: EStatus, fieldId?: string) => void;
   build: (field: TField, building: TBuilding, playerId: number) => void;
   disableMapField: (fieldId: string) => void;
   initMap: (map: TMap) => void;
   sendWorker: (playerId: number, field: TField) => void;
   cleanupMapWorkers: () => void;
+  setMemorizedField: (field: TBuildArea | null) => void;
 };
 
 type TReducer = {
   map: TMap;
+  memorizedField: TBuildArea | null;
 };
 
 type TReducerActions =
@@ -37,16 +40,19 @@ type TReducerActions =
   | { type: "CLEANUP_WORKERS"; payload: null }
   | { type: "DISABLE_MAP_FIELD"; payload: string }
   | { type: "INIT"; payload: TMap }
-  | { type: "SEND_WORKER"; payload: { playerId: number; field: TField } };
+  | { type: "SEND_WORKER"; payload: { playerId: number; field: TField } }
+  | { type: "SET_MEMORIZED_FIELD"; payload: TBuildArea | null };
 
 export const MapContext = createContext<TContext>({
   map: [],
+  memorizedField: null,
   activateMapFields: () => {},
   build: () => {},
   disableMapField: () => {},
   initMap: () => {},
   sendWorker: () => {},
   cleanupMapWorkers: () => {},
+  setMemorizedField: () => {},
 });
 
 const reducer: Reducer<TReducer, TReducerActions> = (
@@ -191,13 +197,20 @@ const reducer: Reducer<TReducer, TReducerActions> = (
       };
     }
 
+    case "SET_MEMORIZED_FIELD": {
+      return {
+        ...state,
+        memorizedField: payload,
+      };
+    }
+
     default:
       return state;
   }
 };
 
 export const MapProvider: FC<{ children: ReactNode }> = ({ children }) => {
-  const [state, dispatch] = useReducer(reducer, { map: [] });
+  const [state, dispatch] = useReducer(reducer, { map: [], memorizedField: null });
 
   const activateMapFields = (status: EStatus, fieldId?: string) => {
     dispatch({ type: "ACTIVATE_MAP_FIELDS", payload: { status, fieldId } });
@@ -223,6 +236,10 @@ export const MapProvider: FC<{ children: ReactNode }> = ({ children }) => {
     dispatch({ type: "CLEANUP_WORKERS", payload: null });
   };
 
+  const setMemorizedField = (field: TBuildArea | null) => {
+    dispatch({ type: "SET_MEMORIZED_FIELD", payload: field });
+  };
+
   const context = {
     ...state,
     activateMapFields,
@@ -231,6 +248,7 @@ export const MapProvider: FC<{ children: ReactNode }> = ({ children }) => {
     initMap,
     sendWorker,
     cleanupMapWorkers,
+    setMemorizedField
   };
   return <MapContext.Provider value={context}>{children}</MapContext.Provider>;
 };

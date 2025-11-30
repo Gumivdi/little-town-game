@@ -29,7 +29,7 @@ export const ToastProvider: FC<{ children: ReactNode }> = ({ children }) => {
   }, [timeoutId]);
 
   const showToast = (toastType: ERequestStatus, toastMessage: string) => {
-    const toastTimer = 5000;
+    const toastTimer = 5000; 
     const timeout = window.setTimeout(() => {
       hideToast();
     }, toastTimer);
