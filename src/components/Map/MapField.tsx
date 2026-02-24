@@ -23,6 +23,9 @@ import ImgRocks from "@/assets/map/rocks.svg";
 import ImgWorker from "@/assets/user.svg";
 import { ERequestStatus } from "@/shared/enums/requestStatus.enum";
 import { verifyEndRound } from "@/shared/helpers/verifyEndRound";
+import { EBuildings } from "@/shared/enums/buildings.enum";
+import { DSettings } from "@/data/settings.data";
+import { EResources } from "@/shared/enums/resources.enum";
 
 const fieldImages: Record<ETerrains, string | null> = {
   forrest: ImgForrest,
@@ -46,6 +49,7 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
     disableMapField,
     build,
     cleanupMapWorkers,
+    setMemorizedField
   } = useContext(MapContext);
   const { showToast } = useContext(ToastContext);
   const {
@@ -69,6 +73,30 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
     nameKey =
       field.building?.name.replace(" ", "_").concat(`-${currentPlayer.id}`) ||
       "";
+  }
+
+  function canPay(
+    playerResources: TResourcesAll,
+    shouldPayfee: boolean,
+    extraKeys: (keyof TResourcesOnly)[],
+    extraCount: number
+  ): boolean {
+    if (shouldPayfee) {
+      for (const key of Object.keys(DSettings.opponentBuildingFee) as (keyof TResourcesOnly)[]) {
+        const value = DSettings.opponentBuildingFee[key] ?? 0;
+        const available = (playerResources)[key] ?? 0;
+        if (available < value) {
+          return false;
+        }
+      }
+    }
+
+    let count = 0;
+    for (const key of extraKeys) {
+      count += (playerResources)[key] ?? 0;
+    }
+
+    return count >= extraCount;
   }
 
   const collectAvailableResources = (resources: Partial<TResourcesAll>) => {
@@ -99,12 +127,11 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
   };
 
   const getFieldImage = (type: ETerrains) =>
-    isGrass ? null : <ReactSVG src={fieldImages[type]!} />;
+    isGrass ? null : <ReactSVG src={fieldImages[type]!} className="mx-auto max-w-[85%]" />;
 
   const finishCollecting = () => {
     setStatus(EStatus.SELECT_ACTION);
     activateMapFields(EStatus.SELECT_ACTION);
-    nextPlayer();
     verifyEndRound(players, round, {
       prepareNextRound: (nextRound, startingWorkers) => {
         cleanupMapWorkers();
@@ -125,6 +152,7 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
         );
       },
     });
+    nextPlayer();
   };
 
   const actionHandler = () => {
@@ -170,10 +198,30 @@ const MapField: React.FC<{ field: TField }> = ({ field }) => {
                 const { id: playerId, resources: playerResources } =
                   currentPlayer;
                 const hasDifferentOwner =
-                  buildingOwnerId && buildingOwnerId !== playerId;
+                  !!buildingOwnerId && buildingOwnerId !== playerId;
+
+
+                if (field.building?.name === EBuildings.LOMBARD) {
+                  if (!canPay(
+                    playerResources,
+                    hasDifferentOwner, 
+                    [EResources.WOOD, EResources.FISH, EResources.STONE, EResources.WHEAT], 
+                    2
+                  )) {
+                    showToast(
+                      ERequestStatus.ERROR,
+                      `Not enough resources to use the ${EBuildings.LOMBARD}!`
+                    );
+                    return;
+                  }
+
+                  setMemorizedField(field);
+                  setStatus(EStatus.LOMBARD_EXCHANGE);
+                  return;
+                }
 
                 if (hasDifferentOwner) {
-                  const cost: Partial<TResourcesOnly> = { coin: 1 };
+                  const cost = DSettings.opponentBuildingFee;
                   const mergedCost = calculateResources(
                     require || {},
                     cost,

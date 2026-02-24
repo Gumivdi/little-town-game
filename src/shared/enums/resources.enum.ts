@@ -5,4 +5,5 @@ export enum EResources {
   WHEAT = "wheat",
   WOOD = "wood",
   POINT = "point",
+  UNKNOWN = "unknown",
 }

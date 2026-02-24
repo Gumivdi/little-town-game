@@ -11,6 +11,8 @@ const InfoBar: FC<{ children?: ReactNode }> = ({ children }) => {
     [EStatus.SELECT_ACTION]: 'Select action "Send worker" or "Build"',
     [EStatus.SELECT_BUILDING]: "Select the building which you want to build",
     [EStatus.SEND_WORKER]: "Place the worker in a free grass area",
+    [EStatus.EXCHANGE]: "Exchange coins for resources",
+    [EStatus.LOMBARD_EXCHANGE]: "Exchange resources at the Lombard",
   };
 
   return (

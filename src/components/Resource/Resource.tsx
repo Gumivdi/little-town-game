@@ -14,6 +14,7 @@ const Resource: React.FC<TProps> = ({ type, size, children, ...args }) => {
     stone: "bg-stone-600",
     wheat: "bg-yellow-500",
     wood: "bg-amber-900",
+    unknown: "bg-gray-400",
   };
 
   const roundedResources = [EResources.COIN, EResources.POINT];

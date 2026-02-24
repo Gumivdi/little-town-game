@@ -66,7 +66,7 @@ const ModalExchange: React.FC<ModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+      className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-40"
       onClick={onClose}
     >
       <div
@@ -97,7 +97,7 @@ const ModalExchange: React.FC<ModalProps> = ({ isOpen, onClose }) => {
             value: resourceAmounts[resource],
             onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
               handleSliderChange(resource, parseInt(e.target.value)),
-            className: "w-full",
+            className: "w-full opacity-100 disabled:opacity-5",
           };
 
           return (
@@ -131,7 +131,8 @@ const ModalExchange: React.FC<ModalProps> = ({ isOpen, onClose }) => {
           </button>
           <button
             onClick={handleSubmit}
-            className="w-1/2 px-4 py-2 bg-blue-500 text-white rounded-lg"
+            disabled={calculateCost(resourceAmounts) === 0}
+            className="w-1/2 px-4 py-2 bg-blue-500 text-white rounded-lg disabled:opacity-50"
           >
             Exchange
           </button>

@@ -4,19 +4,21 @@ import ResourceValue from "@/components/Resource/ResourceValue";
 import Resource from "@/components/Resource/Resource";
 import ResourceMapObject from "@/components/Resource/ResourceMapObject";
 import ResourceMap from "@/components/Resource/ResourceMap";
+import { EBuildings } from "@/shared/enums/buildings.enum";
+import { isObjectEmpty } from "@/shared/helpers/isObjectEmpty";
 
 const BuildingFooter: React.FC<TFooterProps> = ({ building, nameKey }) => {
-  const { action } = building;
+  const { action, name } = building;
   const require = action?.require;
   const benefit = action?.benefit;
 
   return (
     <footer className="min-h-9 flex items-center justify-center bg-slate-200 w-full px-2 py-1">
       <div className="flex flex-wrap items-center gap-1">
-        {!!require && (
+        {(require && !isObjectEmpty(require)) && (
           <>
             <ResourceMapObject
-              uniqueKey={nameKey.concat("-require_wrap")}
+              uniqueKey={nameKey.concat(`-${building.quantity}`, "-require_wrap")}
               object={require}
               fallback={(resource) => (
                 <ResourceMap
@@ -27,11 +29,11 @@ const BuildingFooter: React.FC<TFooterProps> = ({ building, nameKey }) => {
                 </ResourceMap>
               )}
             />
-            <p className="mx-1 text-xl text-black">&gt;</p>
+            <p className="mx-1 text-xs text-black">&gt;</p>
           </>
         )}
 
-        {!!benefit && (
+        {(benefit && !isObjectEmpty(benefit)) && (
           <ResourceMapObject
             uniqueKey={nameKey.concat("-benefit_wrap")}
             object={benefit}
@@ -54,6 +56,18 @@ const BuildingFooter: React.FC<TFooterProps> = ({ building, nameKey }) => {
         )}
 
         {!benefit && !require ? <span>🚫</span> : null}
+        
+        {name === EBuildings.LOMBARD && 
+          Array.from({ length: 5 }).map((_, i) => {
+            const uniqueKey = nameKey.concat(`-lombard-${i}`);
+            if (i == 2) return <p key={uniqueKey} className="mx-1 text-xs text-black">&gt;</p>
+            return (
+            <Resource key={uniqueKey} type={EResources.UNKNOWN} size={4}>
+              ?
+            </Resource>
+          )
+          })
+        }
       </div>
     </footer>
   );

@@ -3,7 +3,7 @@ import { MapContext } from "@/context/map.context";
 import MapField from "./MapField";
 
 const classes = {
-  ul: "h-svh grid grid-row-fr",
+  ul: "h-full grid pt-[48px] h-svh",
   li: "w-full grid grid-cols-9",
 };
 

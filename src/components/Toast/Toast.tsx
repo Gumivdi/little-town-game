@@ -20,7 +20,7 @@ const Toast: FC<TProps> = ({ type, message }) => {
 
   return (
     <div
-      className="absolute bottom-6 left-0 right-0 mx-auto flex items-center w-full max-w-xs p-4 text-white bg-gray-800 rounded-lg shadow"
+      className="absolute bottom-6 left-0 right-0 mx-auto flex items-center w-full max-w-xs p-4 text-white bg-gray-800 rounded-lg shadow z-50"
       role="alert"
     >
       <ToastStatusIcon />
