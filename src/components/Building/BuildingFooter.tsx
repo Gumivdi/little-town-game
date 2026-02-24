@@ -18,7 +18,7 @@ const BuildingFooter: React.FC<TFooterProps> = ({ building, nameKey }) => {
         {(require && !isObjectEmpty(require)) && (
           <>
             <ResourceMapObject
-              uniqueKey={nameKey.concat("-require_wrap")}
+              uniqueKey={nameKey.concat(`-${building.quantity}`, "-require_wrap")}
               object={require}
               fallback={(resource) => (
                 <ResourceMap

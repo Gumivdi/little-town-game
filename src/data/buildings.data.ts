@@ -27,8 +27,22 @@ export const DSpecialBuildings = [
 export const DWithoutBenefitBuildings = [EBuildings.STATUE];
 
 export const DBuildings: TBuilding[] = [
+   {
+    name: EBuildings.WHEAT_FIELD,
+    quantity: 5,
+    point: 3,
+    cost: {
+      wood: 1,
+    },
+    action: {
+      benefit: {
+        wheat: 1,
+      },
+    },
+  },
   {
     name: EBuildings.BAKERY,
+    quantity: 1,
     point: 4,
     cost: {
       wood: 2,
@@ -45,6 +59,7 @@ export const DBuildings: TBuilding[] = [
 
   {
     name: EBuildings.BARN,
+    quantity: 1,
     point: 6,
     cost: {
       wood: 4,
@@ -61,6 +76,7 @@ export const DBuildings: TBuilding[] = [
 
   {
     name: EBuildings.BOOKSTORE,
+    quantity: 1,
     point: 8,
     cost: {
       stone: 4,
@@ -74,6 +90,7 @@ export const DBuildings: TBuilding[] = [
 
   {
     name: EBuildings.BREWERY,
+    quantity: 1,
     point: 4,
     cost: {
       wood: 2,
@@ -90,6 +107,7 @@ export const DBuildings: TBuilding[] = [
 
   {
     name: EBuildings.CARPENTER,
+    quantity: 1,
     point: 4,
     cost: {
       wood: 2,
@@ -106,6 +124,7 @@ export const DBuildings: TBuilding[] = [
 
   {
     name: EBuildings.CASTLE,
+    quantity: 1,
     point: 0,
     cost: {
       stone: 6,
@@ -118,6 +137,7 @@ export const DBuildings: TBuilding[] = [
 
   {
     name: EBuildings.CATHEDRAL,
+    quantity: 1,
     point: 11,
     cost: {
       stone: 6,
@@ -130,6 +150,7 @@ export const DBuildings: TBuilding[] = [
 
   {
     name: EBuildings.CHURCH,
+    quantity: 1,
     point: 8,
     cost: {
       stone: 4,
@@ -146,6 +167,7 @@ export const DBuildings: TBuilding[] = [
 
   {
     name: EBuildings.FISHERMAN,
+    quantity: 1,
     point: 4,
     cost: {
       wood: 1,
@@ -163,6 +185,7 @@ export const DBuildings: TBuilding[] = [
 
   {
     name: EBuildings.FOUNTAIN,
+    quantity: 1,
     point: 5,
     cost: {
       stone: 2,
@@ -179,6 +202,7 @@ export const DBuildings: TBuilding[] = [
 
   {
     name: EBuildings.GOLDMINE,
+    quantity: 1,
     point: 4,
     cost: {
       wood: 1,
@@ -193,6 +217,7 @@ export const DBuildings: TBuilding[] = [
 
   {
     name: EBuildings.LOMBARD,
+    quantity: 1,
     point: 5,
     cost: {
       wood: 3,
@@ -205,6 +230,7 @@ export const DBuildings: TBuilding[] = [
 
   {
     name: EBuildings.MARKET,
+    quantity: 1,
     point: 6,
     cost: {
       wood: 4,
@@ -224,6 +250,7 @@ export const DBuildings: TBuilding[] = [
 
   {
     name: EBuildings.PIER,
+    quantity: 1,
     point: 5,
     cost: {
       wood: 3,
@@ -237,6 +264,7 @@ export const DBuildings: TBuilding[] = [
 
   {
     name: EBuildings.QUARRY,
+    quantity: 1,
     point: 5,
     cost: {
       wood: 3,
@@ -253,6 +281,7 @@ export const DBuildings: TBuilding[] = [
 
   {
     name: EBuildings.RESIDENCE,
+    quantity: 1,
     point: 2,
     cost: {
       coin: 6,
@@ -267,6 +296,7 @@ export const DBuildings: TBuilding[] = [
 
   {
     name: EBuildings.RESTAURANT,
+    quantity: 1,
     point: 7,
     cost: {
       stone: 2,
@@ -285,6 +315,7 @@ export const DBuildings: TBuilding[] = [
 
   {
     name: EBuildings.STATUE,
+    quantity: 1,
     point: 10,
     cost: {
       stone: 4,
@@ -293,6 +324,7 @@ export const DBuildings: TBuilding[] = [
 
   {
     name: EBuildings.STORE,
+    quantity: 1,
     point: 4,
     cost: {
       wood: 2,
@@ -310,6 +342,7 @@ export const DBuildings: TBuilding[] = [
 
   {
     name: EBuildings.TAVERN,
+    quantity: 1,
     point: 7,
     cost: {
       stone: 2,
@@ -324,6 +357,7 @@ export const DBuildings: TBuilding[] = [
 
   {
     name: EBuildings.WAREHOUSE,
+    quantity: 1,
     point: 8,
     cost: {
       stone: 4,
@@ -340,6 +374,7 @@ export const DBuildings: TBuilding[] = [
 
   {
     name: EBuildings.WATCHTOWER,
+    quantity: 1,
     point: 0,
     cost: {
       wood: 3,
@@ -353,6 +388,7 @@ export const DBuildings: TBuilding[] = [
 
   {
     name: EBuildings.WELL,
+    quantity: 1,
     point: 4,
     cost: {
       wood: 1,
@@ -367,6 +403,7 @@ export const DBuildings: TBuilding[] = [
 
   {
     name: EBuildings.WHEAT_FIELD,
+    quantity: 1,
     point: 3,
     cost: {
       wood: 1,
@@ -380,6 +417,7 @@ export const DBuildings: TBuilding[] = [
 
   {
     name: EBuildings.WORKSHOP,
+    quantity: 1,
     point: 5,
     cost: {
       stone: 2,

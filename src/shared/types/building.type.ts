@@ -9,6 +9,7 @@ type TBuildingAction = {
 
 export type TBuildingBase = {
   name: EBuildings;
+  quantity: number;
   point: number;
   cost: Partial<TResourcesAll>;
   action?: TBuildingAction;

@@ -9,11 +9,14 @@ import { PlayersContext } from "@/context/players.context";
 import { SupplyContext } from "@/context/supply.context";
 import { MapContext } from "@/context/map.context";
 import { BuildingsContext } from "@/context/buildings.context";
+import { StatusContext } from "@/context/status.context";
+import { EStatus } from "@/shared/enums/status.enum";
 
 const DevelopmentActions = () => {
   const { initMap } = useContext(MapContext);
   const { takeFromSupply, restoreToSupply } = useContext(SupplyContext);
   const { initRecommended } = useContext(BuildingsContext);
+  const { setStatus } = useContext(StatusContext);
   const {
     currentPlayer,
     initPlayers,
@@ -51,7 +54,7 @@ const DevelopmentActions = () => {
   };
 
   return (
-    <div className="flex gap-3">
+    <div className="flex gap-3 text-xs">
       <button className="bg-black p-3" onClick={setupTheGame}>
         Setup the game
       </button>
@@ -63,9 +66,12 @@ const DevelopmentActions = () => {
       </button>
       <button
         className="bg-black p-3"
-        onClick={() => receive({ wood: 2, stone: 2, point: 3 })}
+        onClick={() => receive({ wood: 2, stone: 2, point: 3, coin: 2 })}
       >
         Receive
+      </button>
+      <button className="bg-black p-3" onClick={() => setStatus(EStatus.LOMBARD_EXCHANGE)}>
+        Open Lombard Modal
       </button>
       <button className="bg-black p-3" onClick={nextPlayer}>
         Next player ({currentPlayer.name})

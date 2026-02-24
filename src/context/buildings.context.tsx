@@ -79,12 +79,19 @@ const reducer: Reducer<TReducer, TReducerActions> = (
     }
 
     case "REMOVE": {
-      const filteredMarket = [...state.buildings].filter(
-        (building) => building.name !== payload
-      );
+      const buildingsCopy = [...state.buildings];
+      const selectedBuilding = buildingsCopy.find((building) => building.name === payload);
+
+      if (selectedBuilding && selectedBuilding.quantity > 0) {
+        selectedBuilding.quantity -= 1;
+        return {
+          ...state,
+          buildings: buildingsCopy,
+        };
+      }
       return {
         ...state,
-        buildings: filteredMarket,
+        buildings: buildingsCopy.filter((building) => building.name !== payload),
         selectedBuilding: null,
       };
     }
