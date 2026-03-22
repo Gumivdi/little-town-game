@@ -10,7 +10,7 @@ export type TLandscapeArea = {
 export type TBuildArea = {
   id?: string;
   disabled?: boolean;
-  type: Required<ETerrains.GRASS>;
+  type: ETerrains.GRASS;
   building: TBuilding | null;
   owner: number | null;
 };
