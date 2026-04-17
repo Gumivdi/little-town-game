@@ -1,6 +1,5 @@
 import { StateCreator } from "zustand";
 import { TMap } from "@/shared/types/map.type";
-import { TGameStore } from "../types";
 
 export interface IMapSlice {
   map: TMap;
@@ -13,8 +12,8 @@ export interface IMapSlice {
   init: (map: TMap) => void;
 }
 
-export type TMapSliceCreator = StateCreator<
-  TGameStore,
+export type TMapSliceCreator<T extends object> = StateCreator<
+  T,
   [],
   [],
   IMapSlice

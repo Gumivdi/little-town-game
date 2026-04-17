@@ -1,8 +1,8 @@
 import { ETerrains } from "@/shared/enums/terrains.enum";
 import { updateMapFields } from "@/shared/helpers/updateMapFields";
-import { TMapSliceCreator } from "./map.types";
+import { IMapSlice, TMapSliceCreator } from "./map.types";
 
-export const createMapSlice: TMapSliceCreator = (set, get) => ({
+export const createMapSlice: TMapSliceCreator<IMapSlice> = (set, get) => ({
   map: [],
 
   activateFreeGrass: () => {
