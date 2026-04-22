@@ -1,0 +1,19 @@
+name: Auto Approve After Gimmy Review
+
+on:
+  pull_request:
+    types: [labeled]
+
+jobs:
+  auto-approve:
+    if: github.event.label.name == 'reviewed-by-gimmy'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Approve PR
+        run: |
+          gh pr review ${{ github.event.pull_request.number }} --approve
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
