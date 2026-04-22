@@ -11,7 +11,7 @@ const createTestStore = () =>
 
 
 describe("PlayersSlice", () => {
-  describe("setNextPlayer", () => {
+  describe("setNextPlayer()", () => {
     it("should set next player", () => {
       const store = createTestStore();
       store.setState({
@@ -35,7 +35,7 @@ describe("PlayersSlice", () => {
     });
   });
 
-  describe("updatePlayer", () => {
+  describe("updatePlayer()", () => {
     it("should update player data", () => {
       const store = createTestStore();
       store.setState({

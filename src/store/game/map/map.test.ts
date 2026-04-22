@@ -16,7 +16,7 @@ const P = POND;
 const G = GRASS;
 
 describe("MapSlice", () => {
-  describe("activateFreeGrass", () => {
+  describe("activateFreeGrass()", () => {
     it("activate free grass fields", () => {
       const store = createTestStore();
 
@@ -43,7 +43,7 @@ describe("MapSlice", () => {
     });
   });
 
-  describe("activateNeighboursForCollect", () => {
+  describe("activateNeighboursForCollect()", () => {
     it("activate neighbours for collect", () => {
       const store = createTestStore();
 
@@ -69,7 +69,7 @@ describe("MapSlice", () => {
     });
   });
 
-  describe("cleanupWorkers", () => {
+  describe("cleanupWorkers()", () => {
     it("remove workers from the map", () => {
       const store = createTestStore();
 
@@ -95,7 +95,7 @@ describe("MapSlice", () => {
     });
   });
 
-  describe("disableField", () => {
+  describe("disableField()", () => {
     it("set disabled to true for a specific field", () => {
       const store = createTestStore();
 
@@ -110,7 +110,7 @@ describe("MapSlice", () => {
     });
   });
 
-  describe("disableFields", () => {
+  describe("disableFields()", () => {
     it("disable all fields", () => {
       const store = createTestStore();
 
@@ -131,7 +131,7 @@ describe("MapSlice", () => {
     });
   });
 
-  describe("init", () => {
+  describe("init()", () => {
     it("sets id and disabled for each field", () => {
       const store = createTestStore();
 
