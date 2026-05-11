@@ -1,12 +1,15 @@
 import { StateCreator } from "zustand";
 import { TPlayer } from "@/shared/types/player.type";
+import { TResourcesAll } from "@/shared/types/resources.type";
 
 export interface IPlayersSlice {
   players: TPlayer[];
-  currentPlayer: number;
-
+  currentPlayerIndex: number;
+  _decreasePlayerComponents: (component: "workers" | "buildings") => void;
+  decrementPlayerBuildings: () => void;
+  decrementPlayerWorkers: () => void;
   setNextPlayer: () => void;
-  updatePlayer: (id: number, data: TDeepParial<TPlayer>) => void;
+  updatePlayerResources: (id: number, data: Partial<TResourcesAll>) => void;
 }
 
 export type TPlayersSliceCreator<T extends object> = StateCreator<
@@ -14,10 +17,8 @@ export type TPlayersSliceCreator<T extends object> = StateCreator<
   [],
   [],
   IPlayersSlice
->
+>;
 
-export type TDeepParial<T> = {
-  [K in keyof T]?: T[K] extends object
-    ? TDeepParial<T[K]>
-    : T[K]
-}
+export type TDeepPartial<T> = {
+  [K in keyof T]?: T[K] extends object ? TDeepPartial<T[K]> : T[K];
+};
