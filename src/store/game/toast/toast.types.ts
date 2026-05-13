@@ -2,10 +2,10 @@ import { StateCreator } from "zustand";
 import { ERequestStatus } from "@/shared/enums/requestStatus.enum";
 
 export interface IToastSlice {
-  type?: ERequestStatus;
-  message: string;
-  show: (type: ERequestStatus, message: string) => void;
-  hide: () => void;
+  toastType?: ERequestStatus;
+  toastMessage: string;
+  showToast: (type: ERequestStatus, message: string) => void;
+  hideToast: () => void;
 }
 
 export type TToastSliceCreator<T extends object> = StateCreator<

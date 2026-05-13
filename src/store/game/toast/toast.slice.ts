@@ -4,14 +4,14 @@ export const createToastSlice: TToastSliceCreator<IToastSlice> = (
   set,
   get,
 ) => ({
-  type: undefined,
-  message: "",
+  toastType: undefined,
+  toastMessage: "",
 
-  show: (type, message) => {
-    set({ type, message });
+  showToast: (toastType, toastMessage) => {
+    set({ toastType, toastMessage });
   },
 
-  hide: () => {
-    set({ type: undefined, message: "" });
+  hideToast: () => {
+    set({ toastType: undefined, toastMessage: "" });
   },
 });
