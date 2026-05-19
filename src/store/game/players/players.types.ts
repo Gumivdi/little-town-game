@@ -5,6 +5,7 @@ import { TResourcesAll } from "@/shared/types/resources.type";
 export interface IPlayersSlice {
   players: TPlayer[];
   currentPlayerIndex: number;
+
   _decreasePlayerComponents: (component: "workers" | "buildings") => void;
   decrementPlayerBuildings: () => void;
   decrementPlayerWorkers: () => void;
@@ -18,7 +19,3 @@ export type TPlayersSliceCreator<T extends object> = StateCreator<
   [],
   IPlayersSlice
 >;
-
-export type TDeepPartial<T> = {
-  [K in keyof T]?: T[K] extends object ? TDeepPartial<T[K]> : T[K];
-};

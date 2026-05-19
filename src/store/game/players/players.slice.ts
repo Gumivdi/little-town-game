@@ -1,6 +1,4 @@
-import { TResourcesAll } from "@/shared/types/resources.type";
 import { IPlayersSlice, TPlayersSliceCreator } from "./players.types";
-import { HDeepMerge } from "@/store/helpers";
 
 export const createPlayersSlice: TPlayersSliceCreator<IPlayersSlice> = (
   set,
@@ -10,16 +8,24 @@ export const createPlayersSlice: TPlayersSliceCreator<IPlayersSlice> = (
   currentPlayerIndex: 0,
 
   _decreasePlayerComponents: (component) => {
-    set((state) => {
-      const currentPlayer = state.players[state.currentPlayerIndex];
-      const updatedPlayer = {
-        ...currentPlayer,
-        [component]: currentPlayer[component] - 1,
-      };
-      const players = [...state.players];
-      players[state.currentPlayerIndex] = updatedPlayer;
-      return { players };
-    });
+    set((state) => ({
+      players: state.players.map((player, index) =>
+        index === state.currentPlayerIndex
+          ? {
+              ...player,
+              [component]: player[component] - 1,
+            }
+          : player,
+      ),
+    }));
+  },
+
+  decrementPlayerBuildings: () => {
+    get()._decreasePlayerComponents("buildings");
+  },
+
+  decrementPlayerWorkers: () => {
+    get()._decreasePlayerComponents("workers");
   },
 
   setNextPlayer: () => {
@@ -32,28 +38,18 @@ export const createPlayersSlice: TPlayersSliceCreator<IPlayersSlice> = (
   },
 
   updatePlayerResources: (id, data) => {
-    set((state) => {
-      const players = [...state.players];
-      const index = players.findIndex((item) => item.id === id);
-      if (index === -1) return state;
-
-      const updatedResources = <TResourcesAll>(
-        HDeepMerge(state.players[index].resources, data)
-      );
-      const updatedPlayer = {
-        ...state.players[index],
-        resources: updatedResources,
-      };
-      players[index] = updatedPlayer;
-      return { players };
-    });
-  },
-
-  decrementPlayerWorkers: () => {
-    get()._decreasePlayerComponents("workers");
-  },
-
-  decrementPlayerBuildings: () => {
-    get()._decreasePlayerComponents("buildings");
+    set((state) => ({
+      players: state.players.map((player) =>
+        player.id === id
+          ? {
+              ...player,
+              resources: {
+                ...player.resources,
+                ...data,
+              },
+            }
+          : player,
+      ),
+    }));
   },
 });
