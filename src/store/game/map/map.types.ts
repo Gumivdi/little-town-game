@@ -1,21 +1,26 @@
 import { StateCreator } from "zustand";
-import { TMap } from "@/shared/types/map.type";
+import { TFieldID, TMap } from "@/shared/types/map.type";
 import { TBuilding } from "@/shared/types/building.type";
 
 export interface IMapSlice {
   map: TMap;
-  disableField: (fieldID: string) => void;
-  enableField: (fieldID: string) => void;
-  setFieldBuilding: (fieldID: string, building: TBuilding) => void;
-  setFieldOwner: (fieldID: string, owner: number) => void;
-  unsetFieldOwner: (fieldID: string) => void;
+  memorizedFieldId: TFieldID | null;
 
-  // ACTIONS ---------
-  // activateFreeGrass: () => void;
-  // activateNeighboursForCollect: (fieldID: string) => void;
-  // cleanupWorkers: () => void;
-  // disableFields: () => void;
-  // initMap: (map: TMap) => void;
+  clearOwnersOnEmptyGrass: () => void;
+
+  disableField: (fieldId: TFieldID) => void;
+  disableFields: () => void;
+
+  enableCollectableFields: (fieldId: TFieldID) => void;
+  enableEmptyGrassFields: () => void;
+  enableField: (fieldId: TFieldID) => void;
+
+  setFieldBuilding: (fieldId: TFieldID, building: TBuilding) => void;
+  setFieldOwner: (fieldId: TFieldID, owner: number) => void;
+  setMap: (map: TMap) => void;
+  setMemorizedFieldId: (fieldId: TFieldID) => void;
+
+  unsetFieldOwner: (fieldId: TFieldID) => void;
 }
 
 export type TMapSliceCreator<T extends object> = StateCreator<
@@ -24,7 +29,3 @@ export type TMapSliceCreator<T extends object> = StateCreator<
   [],
   IMapSlice
 >;
-
-// export type TDeepPartial<T> = {
-//   [K in keyof T]?: T[K] extends object ? TDeepPartial<T[K]> : T[K];
-// };

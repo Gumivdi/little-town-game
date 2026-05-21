@@ -1,14 +1,16 @@
 import { ETerrains } from "@/shared/enums/terrains.enum";
 import { TBuilding } from "./building.type";
 
+export type TFieldID = `${number}-${number}-${number}-${number}`;
+
 export type TLandscapeArea = {
-  id?: string;
+  id?: TFieldID;
   disabled?: boolean;
   type: Exclude<ETerrains, ETerrains.GRASS>;
 };
 
 export type TBuildArea = {
-  id?: string;
+  id?: TFieldID;
   disabled?: boolean;
   type: ETerrains.GRASS;
   building: TBuilding | null;
@@ -17,3 +19,9 @@ export type TBuildArea = {
 
 export type TField = TLandscapeArea | TBuildArea;
 export type TMap = TField[][];
+export type TFieldCoordinates = {
+  row: number;
+  col: number;
+  rows: number;
+  cols: number;
+};
