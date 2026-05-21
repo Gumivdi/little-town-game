@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { getBuilding } from "@/shared/helpers/map/get-building";
+import { getBuilding } from "@/shared/helpers/buildings/get-building";
 import { EBuildings } from "@/shared/enums/buildings.enum";
 import { FORREST, POND, ROCKS } from "@/data/fields.data";
 import { createTestStore } from "./setup/create-test-store";
