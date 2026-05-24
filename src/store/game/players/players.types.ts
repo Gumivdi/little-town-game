@@ -6,11 +6,19 @@ export interface IPlayersSlice {
   players: TPlayer[];
   currentPlayerIndex: number;
 
-  _decreasePlayerComponents: (component: "workers" | "buildings") => void;
-  decrementPlayerBuildings: () => void;
-  decrementPlayerWorkers: () => void;
+  // --- GETTERS ---
+  getPlayerResources: () => TResourcesAll;
+
+  // --- SETTERS ---
   setNextPlayer: () => void;
-  updatePlayerResources: (id: number, data: Partial<TResourcesAll>) => void;
+  setPlayerResources: (id: number, resources: Partial<TResourcesAll>) => void;
+
+  // --- METHODS ---
+  decrementPlayerWorkers: () => void;
+  decrementPlayerBuildings: () => void;
+
+  // --- PRIVATE METHODS ---
+  _decreasePlayerComponents: (component: "workers" | "buildings") => void;
 }
 
 export type TPlayersSliceCreator<T extends object> = StateCreator<

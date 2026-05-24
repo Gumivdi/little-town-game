@@ -7,27 +7,13 @@ export const createPlayersSlice: TPlayersSliceCreator<IPlayersSlice> = (
   players: [],
   currentPlayerIndex: 0,
 
-  _decreasePlayerComponents: (component) => {
-    set((state) => ({
-      players: state.players.map((player, index) =>
-        index === state.currentPlayerIndex
-          ? {
-              ...player,
-              [component]: player[component] - 1,
-            }
-          : player,
-      ),
-    }));
+  // --- GETTERS ---
+  getPlayerResources: () => {
+    const { players, currentPlayerIndex } = get();
+    return players[currentPlayerIndex].resources;
   },
 
-  decrementPlayerBuildings: () => {
-    get()._decreasePlayerComponents("buildings");
-  },
-
-  decrementPlayerWorkers: () => {
-    get()._decreasePlayerComponents("workers");
-  },
-
+  // --- SETTERS ---
   setNextPlayer: () => {
     set((state) => {
       const isLastPlayer =
@@ -37,7 +23,7 @@ export const createPlayersSlice: TPlayersSliceCreator<IPlayersSlice> = (
     });
   },
 
-  updatePlayerResources: (id, data) => {
+  setPlayerResources: (id, resources) => {
     set((state) => ({
       players: state.players.map((player) =>
         player.id === id
@@ -45,8 +31,31 @@ export const createPlayersSlice: TPlayersSliceCreator<IPlayersSlice> = (
               ...player,
               resources: {
                 ...player.resources,
-                ...data,
+                ...resources,
               },
+            }
+          : player,
+      ),
+    }));
+  },
+
+  // --- METHODS ---
+  decrementPlayerBuildings: () => {
+    get()._decreasePlayerComponents("buildings");
+  },
+
+  decrementPlayerWorkers: () => {
+    get()._decreasePlayerComponents("workers");
+  },
+
+  // --- PRIVATE METHODS ---
+  _decreasePlayerComponents: (component) => {
+    set((state) => ({
+      players: state.players.map((player, index) =>
+        index === state.currentPlayerIndex
+          ? {
+              ...player,
+              [component]: player[component] - 1,
             }
           : player,
       ),
