@@ -7,16 +7,18 @@ export interface IMarketSlice {
   market: TBuilding[];
   selectedMarketItem: EBuildings | null;
 
+  // --- SETTERS ---
+  setAvailableMarket: (names: EBuildings[]) => void;
+  setMarket: (market: TBuilding[]) => void;
+  setSelectedMarketItem: (name: EBuildings | null) => void;
+
+  // --- METHODS ---
   decreaseMarketItemQuantity: (name: EBuildings) => void;
 
   initRandomMarket: () => void;
   initRecommendedMarket: () => void;
 
   removeFromMarket: (name: EBuildings) => void;
-
-  setAvailableMarket: (names: EBuildings[]) => void;
-  setMarket: (market: TBuilding[]) => void;
-  setSelectedMarketItem: (name: EBuildings | null) => void;
 }
 
 export type TMarketSliceCreator<T extends object> = StateCreator<

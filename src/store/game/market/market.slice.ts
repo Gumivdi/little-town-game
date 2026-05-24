@@ -10,6 +10,12 @@ export const createMarketSlice: TMarketSliceCreator<IMarketSlice> = (
   market: [],
   selectedMarketItem: null,
 
+  // --- SETTERS ---
+  setAvailableMarket: (names) => set({ availableMarket: names }),
+  setMarket: (market) => set({ market }),
+  setSelectedMarketItem: (name) => set({ selectedMarketItem: name }),
+
+  // --- METHODS ---
   decreaseMarketItemQuantity: (name) => {
     set((state) => ({
       market: state.market.map((building) =>
@@ -52,17 +58,5 @@ export const createMarketSlice: TMarketSliceCreator<IMarketSlice> = (
     set((state) => ({
       market: state.market.filter((building) => building.name !== name),
     }));
-  },
-
-  setAvailableMarket: (names) => {
-    set({ availableMarket: names });
-  },
-
-  setMarket: (market) => {
-    set({ market });
-  },
-
-  setSelectedMarketItem: (name) => {
-    set({ selectedMarketItem: name });
   },
 });

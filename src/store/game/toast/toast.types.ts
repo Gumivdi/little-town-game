@@ -5,6 +5,7 @@ export interface IToastSlice {
   toastMessage: string;
   toastType?: ERequestStatus;
 
+  // --- METHODS ---
   hideToast: () => void;
   showToast: (type: ERequestStatus, message: string) => void;
 }

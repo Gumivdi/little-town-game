@@ -9,6 +9,27 @@ export const createMapSlice: TMapSliceCreator<IMapSlice> = (set, get) => ({
   map: [],
   memorizedFieldId: null,
 
+  // --- SETTERS ---
+  setFieldBuilding: (fieldId, building) =>
+    set((state) => ({
+      map: updateMapField(state.map, fieldId, (field) => ({
+        ...field,
+        building,
+      })),
+    })),
+
+  setFieldOwner: (fieldId, owner) =>
+    set((state) => ({
+      map: updateMapField(state.map, fieldId, (field) => ({
+        ...field,
+        owner,
+      })),
+    })),
+
+  setMap: (map) => set({ map }),
+  setMemorizedFieldId: (fieldId) => set({ memorizedFieldId: fieldId }),
+
+  // --- METHODS ---
   clearOwnersOnEmptyGrass: () => {
     set((state) => ({
       map: updateMapFields(state.map, (_, { colItem }) =>
@@ -59,32 +80,6 @@ export const createMapSlice: TMapSliceCreator<IMapSlice> = (set, get) => ({
         disabled: false,
       })),
     }));
-  },
-
-  setFieldBuilding: (fieldId, building) => {
-    set((state) => ({
-      map: updateMapField(state.map, fieldId, (field) => ({
-        ...field,
-        building,
-      })),
-    }));
-  },
-
-  setFieldOwner: (fieldId, owner) => {
-    set((state) => ({
-      map: updateMapField(state.map, fieldId, (field) => ({
-        ...field,
-        owner,
-      })),
-    }));
-  },
-
-  setMap: (map) => {
-    set({ map });
-  },
-
-  setMemorizedFieldId: (fieldId) => {
-    set({ memorizedFieldId: fieldId });
   },
 
   unsetFieldOwner: (fieldId) => {

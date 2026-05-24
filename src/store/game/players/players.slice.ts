@@ -4,8 +4,8 @@ export const createPlayersSlice: TPlayersSliceCreator<IPlayersSlice> = (
   set,
   get,
 ) => ({
-  players: [],
   currentPlayerIndex: 0,
+  players: [],
 
   // --- GETTERS ---
   getPlayerResources: () => {
@@ -40,13 +40,8 @@ export const createPlayersSlice: TPlayersSliceCreator<IPlayersSlice> = (
   },
 
   // --- METHODS ---
-  decrementPlayerBuildings: () => {
-    get()._decreasePlayerComponents("buildings");
-  },
-
-  decrementPlayerWorkers: () => {
-    get()._decreasePlayerComponents("workers");
-  },
+  decrementPlayerBuildings: () => get()._decreasePlayerComponents("buildings"),
+  decrementPlayerWorkers: () => get()._decreasePlayerComponents("workers"),
 
   // --- PRIVATE METHODS ---
   _decreasePlayerComponents: (component) => {
