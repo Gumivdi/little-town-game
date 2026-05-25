@@ -1,64 +1,93 @@
 import { ETerrains } from "@/shared/enums/terrains.enum";
-import { updateMapFields } from "@/shared/helpers/updateMapFields";
+import { updateMapField } from "@/shared/helpers/map/update-map-field";
+import { updateMapFields } from "@/shared/helpers/map/update-map-fields";
+import { getCollectableFieldIds } from "@/shared/helpers/map/get-collectable-field-ids";
+import { isWorkerOnField } from "@/shared/helpers/map/is-worker-on-field";
 import { IMapSlice, TMapSliceCreator } from "./map.types";
 
-export const createMapSlice: TMapSliceCreator<IMapSlice> = (set, get) => ({
+export const createMapSlice: TMapSliceCreator<IMapSlice> = (set) => ({
   map: [],
+  memorizedFieldId: null,
 
-  activateFreeGrass: () => {
-    const updatedMap = get().map.map((row) => row.map((field) => {
-      if (field.type === ETerrains.GRASS && !field.owner) {
-        return { ...field, disabled: false };
-      }
-      return { ...field, disabled: true };
-    }))
-    set({ map: updatedMap });
-  },
-  
-  activateNeighboursForCollect: (fieldID) => {
-    const updatedMap = get().map.map((row) => row.map((field) => {
-      if (field.id === fieldID) return field;
-      const [fieldRow, fieldCol] = fieldID.split("-").map((item) => +item);
-      const [currentRow, currentCol] = field.id!.split("-").map((item) => +item);
-      const isNearby = Math.abs(fieldRow - currentRow) <= 1 && Math.abs(fieldCol - currentCol) <= 1;
-      const isGrass = field.type === ETerrains.GRASS;
-      const haveBuilding = isGrass && field.building;
-      return { ...field, disabled: !isNearby || (isNearby && isGrass && !haveBuilding) };
-    }))
-    set({ map: updatedMap });
-  },
+  // --- SETTERS ---
+  setFieldBuilding: (fieldId, building) =>
+    set((state) => ({
+      map: updateMapField(state.map, fieldId, (field) => ({
+        ...field,
+        building,
+      })),
+    })),
 
-  cleanupWorkers: () => {
-      const updatedMap = get().map.map((row) => row.map((field) => {
-        const isGrass = field.type === ETerrains.GRASS;
-        const haveOwner = isGrass && !!field.owner;
-        const haveNotBuilding = haveOwner && !field.building;
-        return isGrass && haveOwner && haveNotBuilding
-            ? { ...field, owner: null }
-            : field;
-      }))
-      set({ map: updatedMap });
+  setFieldOwner: (fieldId, owner) =>
+    set((state) => ({
+      map: updateMapField(state.map, fieldId, (field) => ({
+        ...field,
+        owner,
+      })),
+    })),
+
+  setMap: (map) => set({ map }),
+  setMemorizedFieldId: (fieldId) => set({ memorizedFieldId: fieldId }),
+
+  // --- METHODS ---
+  clearOwnersOnEmptyGrass: () => {
+    set((state) => ({
+      map: updateMapFields(state.map, (_, { colItem }) =>
+        isWorkerOnField(colItem) ? { owner: null } : colItem,
+      ),
+    }));
   },
 
-  disableField: (fieldID) => {
-    const updatedMap = get().map.map((row) => row.map((field) => field.id === fieldID ? { ...field, disabled: true } : field))
-    set({ map: updatedMap });
+  disableField: (fieldId) => {
+    set((state) => ({
+      map: updateMapField(state.map, fieldId, (field) => ({
+        ...field,
+        disabled: true,
+      })),
+    }));
   },
 
   disableFields: () => {
-    const updatedMap = get().map.map((row) => row.map((field) => ({ ...field, disabled: true })));
-    set({ map: updatedMap });
+    set((state) => ({
+      map: updateMapFields(state.map, () => ({ disabled: true })),
+    }));
   },
 
-  init: (map) => {
-    const updatedMap = updateMapFields(map, ({ rowIndex }, { colIndex }) => {
-      const mapRows = map.length;
-      const mapCols = map[0].length;
+  enableCollectableFields: (fieldId) => {
+    set((state) => {
+      const collectableIDs = getCollectableFieldIds(state.map, fieldId);
+
       return {
-        id: `${rowIndex}-${colIndex}-${mapRows}-${mapCols}`,
-        disabled: true,
+        map: updateMapFields(state.map, (_, { colItem }) => ({
+          disabled: !collectableIDs.includes(colItem.id!),
+        })),
       };
     });
-    set({ map: updatedMap });
-  }
+  },
+
+  enableEmptyGrassFields: () => {
+    set((state) => ({
+      map: updateMapFields(state.map, (_, { colItem }) => ({
+        disabled: !(colItem.type === ETerrains.GRASS && !colItem.owner),
+      })),
+    }));
+  },
+
+  enableField: (fieldId) => {
+    set((state) => ({
+      map: updateMapField(state.map, fieldId, (field) => ({
+        ...field,
+        disabled: false,
+      })),
+    }));
+  },
+
+  unsetFieldOwner: (fieldId) => {
+    set((state) => ({
+      map: updateMapField(state.map, fieldId, (field) => ({
+        ...field,
+        owner: null,
+      })),
+    }));
+  },
 });

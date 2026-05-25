@@ -3,8 +3,10 @@ import { TResourcesOnly } from "@/shared/types/resources.type";
 
 export interface ISupplySlice {
   supplies: TResourcesOnly;
-  add: (resources : Partial<TResourcesOnly>) => void;
-  remove: (resources : Partial<TResourcesOnly>) => void;
+
+  // --- METHODS ---
+  addToSupply: (resources: Partial<TResourcesOnly>) => void;
+  removeFromSupply: (resources: Partial<TResourcesOnly>) => void;
 }
 
 export type TSupplySliceCreator<T extends object> = StateCreator<
@@ -12,4 +14,4 @@ export type TSupplySliceCreator<T extends object> = StateCreator<
   [],
   [],
   ISupplySlice
->
+>;

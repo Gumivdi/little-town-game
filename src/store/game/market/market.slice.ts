@@ -1,15 +1,29 @@
 import { DBuildings, DBuildingsRecommended } from "@/data/buildings.data";
 import { EBuildings } from "@/shared/enums/buildings.enum";
-import { IBuildingsSlice, TBuildingsSliceCreator } from "./buildings.types";
+import { IMarketSlice, TMarketSliceCreator } from "./market.types";
 
-export const createBuildingsSlice: TBuildingsSliceCreator<IBuildingsSlice> = (
-  set,
-  get,
-) => ({
+export const createMarketSlice: TMarketSliceCreator<IMarketSlice> = (set) => ({
+  availableMarket: [],
   market: [],
-  available: [],
+  selectedMarketItem: null,
 
-  initRandom: () => {
+  // --- SETTERS ---
+  setAvailableMarket: (names) => set({ availableMarket: names }),
+  setMarket: (market) => set({ market }),
+  setSelectedMarketItem: (name) => set({ selectedMarketItem: name }),
+
+  // --- METHODS ---
+  decreaseMarketItemQuantity: (name) => {
+    set((state) => ({
+      market: state.market.map((building) =>
+        building.name === name
+          ? { ...building, quantity: building.quantity - 1 }
+          : building,
+      ),
+    }));
+  },
+
+  initRandomMarket: () => {
     const wheatField = DBuildings.find(
       (building) => building.name === EBuildings.WHEAT_FIELD,
     )!;
@@ -19,10 +33,11 @@ export const createBuildingsSlice: TBuildingsSliceCreator<IBuildingsSlice> = (
     const randomBuildings = allBuildings
       .sort(() => 0.5 - Math.random())
       .slice(0, 12);
+
     set({ market: [wheatField, ...randomBuildings] });
   },
 
-  initRecommended: () => {
+  initRecommendedMarket: () => {
     const wheatField = DBuildings.find(
       (building) => building.name === EBuildings.WHEAT_FIELD,
     )!;
@@ -32,6 +47,7 @@ export const createBuildingsSlice: TBuildingsSliceCreator<IBuildingsSlice> = (
     const recommendedBuildings = allBuildings.filter((building) =>
       DBuildingsRecommended.includes(building.name),
     );
+
     set({ market: [wheatField, ...recommendedBuildings] });
   },
 
@@ -39,17 +55,5 @@ export const createBuildingsSlice: TBuildingsSliceCreator<IBuildingsSlice> = (
     set((state) => ({
       market: state.market.filter((building) => building.name !== name),
     }));
-  },
-
-  updateBuilding: (name, partial) => {
-    set((state) => ({
-      market: state.market.map((building) =>
-        building.name === name ? { ...building, ...partial } : building,
-      ),
-    }));
-  },
-
-  setAvailable: (names) => {
-    set({ available: names });
   },
 });

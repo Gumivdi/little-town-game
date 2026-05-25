@@ -1,26 +1,59 @@
 import { IPlayersSlice, TPlayersSliceCreator } from "./players.types";
-import { HDeepMerge } from "@/store/helpers";
 
-export const createPlayersSlice: TPlayersSliceCreator<IPlayersSlice> = (set, get) => ({
+export const createPlayersSlice: TPlayersSliceCreator<IPlayersSlice> = (
+  set,
+  get,
+) => ({
+  currentPlayerIndex: 0,
   players: [],
-  currentPlayer: 0,
 
-  setNextPlayer: () => {
-    const isLastPlayer =  get().currentPlayer === get().players.length - 1;
-    const nextPlayer = isLastPlayer ? 0 : get().currentPlayer + 1;
-    set({ currentPlayer: nextPlayer})
+  // --- GETTERS ---
+  getPlayerResources: () => {
+    const { players, currentPlayerIndex } = get();
+    return players[currentPlayerIndex].resources;
   },
 
-  updatePlayer: (id, data) => {
-    set(state => {
-      const index = state.players.findIndex(item => item.id === id);
-      if (index === -1) return state;
+  // --- SETTERS ---
+  setNextPlayer: () => {
+    set((state) => {
+      const isLastPlayer =
+        state.currentPlayerIndex === state.players.length - 1;
+      const nextPlayer = isLastPlayer ? 0 : state.currentPlayerIndex + 1;
+      return { currentPlayerIndex: nextPlayer };
+    });
+  },
 
-      const updated = HDeepMerge(state.players[index], data);
-      const players = [...state.players];
-      players[index] = updated;
+  setPlayerResources: (id, resources) => {
+    set((state) => ({
+      players: state.players.map((player) =>
+        player.id === id
+          ? {
+              ...player,
+              resources: {
+                ...player.resources,
+                ...resources,
+              },
+            }
+          : player,
+      ),
+    }));
+  },
 
-      return { players }
-    })
-  }
+  // --- METHODS ---
+  decrementPlayerBuildings: () => get()._decreasePlayerComponents("buildings"),
+  decrementPlayerWorkers: () => get()._decreasePlayerComponents("workers"),
+
+  // --- PRIVATE METHODS ---
+  _decreasePlayerComponents: (component) => {
+    set((state) => ({
+      players: state.players.map((player, index) =>
+        index === state.currentPlayerIndex
+          ? {
+              ...player,
+              [component]: player[component] - 1,
+            }
+          : player,
+      ),
+    }));
+  },
 });

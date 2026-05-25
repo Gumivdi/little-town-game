@@ -1,15 +1,28 @@
 import { StateCreator } from "zustand";
-import { TMap } from "@/shared/types/map.type";
+import { TFieldID, TMap } from "@/shared/types/map.type";
+import { TBuilding } from "@/shared/types/building.type";
 
 export interface IMapSlice {
   map: TMap;
+  memorizedFieldId: TFieldID | null;
 
-  activateFreeGrass: () => void;
-  activateNeighboursForCollect: (fieldID: string) => void;
-  cleanupWorkers: () => void;
-  disableField: (fieldID: string) => void;
+  // --- SETTERS ---
+  setFieldBuilding: (fieldId: TFieldID, building: TBuilding) => void;
+  setFieldOwner: (fieldId: TFieldID, owner: number) => void;
+  setMap: (map: TMap) => void;
+  setMemorizedFieldId: (fieldId: TFieldID) => void;
+
+  // --- METHODS ---
+  clearOwnersOnEmptyGrass: () => void;
+
+  disableField: (fieldId: TFieldID) => void;
   disableFields: () => void;
-  init: (map: TMap) => void;
+
+  enableCollectableFields: (fieldId: TFieldID) => void;
+  enableEmptyGrassFields: () => void;
+  enableField: (fieldId: TFieldID) => void;
+
+  unsetFieldOwner: (fieldId: TFieldID) => void;
 }
 
 export type TMapSliceCreator<T extends object> = StateCreator<
@@ -17,4 +30,4 @@ export type TMapSliceCreator<T extends object> = StateCreator<
   [],
   [],
   IMapSlice
->
+>;

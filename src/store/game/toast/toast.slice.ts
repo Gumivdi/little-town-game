@@ -1,17 +1,10 @@
 import { IToastSlice, TToastSliceCreator } from "./toast.types";
 
-export const createToastSlice: TToastSliceCreator<IToastSlice> = (
-  set,
-  get,
-) => ({
-  type: undefined,
-  message: "",
+export const createToastSlice: TToastSliceCreator<IToastSlice> = (set) => ({
+  toastType: undefined,
+  toastMessage: "",
 
-  show: (type, message) => {
-    set({ type, message });
-  },
-
-  hide: () => {
-    set({ type: undefined, message: "" });
-  },
+  // --- METHODS ---
+  showToast: (toastType, toastMessage) => set({ toastType, toastMessage }),
+  hideToast: () => set({ toastType: undefined, toastMessage: "" }),
 });
