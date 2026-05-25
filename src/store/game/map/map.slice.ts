@@ -2,10 +2,10 @@ import { ETerrains } from "@/shared/enums/terrains.enum";
 import { updateMapField } from "@/shared/helpers/map/update-map-field";
 import { updateMapFields } from "@/shared/helpers/map/update-map-fields";
 import { getCollectableFieldIds } from "@/shared/helpers/map/get-collectable-field-ids";
-import { IMapSlice, TMapSliceCreator } from "./map.types";
 import { isWorkerOnField } from "@/shared/helpers/map/is-worker-on-field";
+import { IMapSlice, TMapSliceCreator } from "./map.types";
 
-export const createMapSlice: TMapSliceCreator<IMapSlice> = (set, get) => ({
+export const createMapSlice: TMapSliceCreator<IMapSlice> = (set) => ({
   map: [],
   memorizedFieldId: null,
 

@@ -1,6 +1,5 @@
 import { create } from "zustand";
-import { IMapSlice } from "../../map.types";
-import { createMapSlice } from "../../map.slice";
+import { createMapSlice, IMapSlice } from "../..";
 
 export const createTestStore = () =>
   create<IMapSlice>((...args) => ({

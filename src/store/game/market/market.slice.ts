@@ -2,10 +2,7 @@ import { DBuildings, DBuildingsRecommended } from "@/data/buildings.data";
 import { EBuildings } from "@/shared/enums/buildings.enum";
 import { IMarketSlice, TMarketSliceCreator } from "./market.types";
 
-export const createMarketSlice: TMarketSliceCreator<IMarketSlice> = (
-  set,
-  get,
-) => ({
+export const createMarketSlice: TMarketSliceCreator<IMarketSlice> = (set) => ({
   availableMarket: [],
   market: [],
   selectedMarketItem: null,

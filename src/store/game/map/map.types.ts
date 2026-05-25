@@ -6,6 +6,13 @@ export interface IMapSlice {
   map: TMap;
   memorizedFieldId: TFieldID | null;
 
+  // --- SETTERS ---
+  setFieldBuilding: (fieldId: TFieldID, building: TBuilding) => void;
+  setFieldOwner: (fieldId: TFieldID, owner: number) => void;
+  setMap: (map: TMap) => void;
+  setMemorizedFieldId: (fieldId: TFieldID) => void;
+
+  // --- METHODS ---
   clearOwnersOnEmptyGrass: () => void;
 
   disableField: (fieldId: TFieldID) => void;
@@ -14,11 +21,6 @@ export interface IMapSlice {
   enableCollectableFields: (fieldId: TFieldID) => void;
   enableEmptyGrassFields: () => void;
   enableField: (fieldId: TFieldID) => void;
-
-  setFieldBuilding: (fieldId: TFieldID, building: TBuilding) => void;
-  setFieldOwner: (fieldId: TFieldID, owner: number) => void;
-  setMap: (map: TMap) => void;
-  setMemorizedFieldId: (fieldId: TFieldID) => void;
 
   unsetFieldOwner: (fieldId: TFieldID) => void;
 }

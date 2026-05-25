@@ -1,9 +1,6 @@
 import { IToastSlice, TToastSliceCreator } from "./toast.types";
 
-export const createToastSlice: TToastSliceCreator<IToastSlice> = (
-  set,
-  get,
-) => ({
+export const createToastSlice: TToastSliceCreator<IToastSlice> = (set) => ({
   toastType: undefined,
   toastMessage: "",
 

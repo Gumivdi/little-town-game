@@ -1,23 +1,23 @@
 import { create } from "zustand";
+import { createFlowSlice, IFlowSlice } from "./flow";
 import { createMapSlice, IMapSlice } from "./map";
+import { createMarketSlice, IMarketSlice } from "./market";
 import { createPlayersSlice, IPlayersSlice } from "./players";
 import { createSupplySlice, ISupplySlice } from "./supply";
-import { createMarketSlice, IMarketSlice } from "./market";
 import { createToastSlice, IToastSlice } from "./toast";
-import { createFlowSlice, IFlowSlice } from "./flow";
 
-export type TGameStore = IMapSlice &
+export type TGameStore = IFlowSlice &
+  IMapSlice &
+  IMarketSlice &
   IPlayersSlice &
   ISupplySlice &
-  IMarketSlice &
-  IToastSlice &
-  IFlowSlice;
+  IToastSlice;
 
 export const useGameStore = create<TGameStore>()((...a) => ({
+  ...createFlowSlice(...a),
   ...createMapSlice(...a),
+  ...createMarketSlice(...a),
   ...createPlayersSlice(...a),
   ...createSupplySlice(...a),
-  ...createMarketSlice(...a),
   ...createToastSlice(...a),
-  ...createFlowSlice(...a),
 }));
