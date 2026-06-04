@@ -11,6 +11,7 @@ export interface IPlayersSlice {
 
   // --- SETTERS ---
   setNextPlayer: () => void;
+  setPlayers: (players: TPlayer[]) => void;
   setPlayerResources: (id: number, resources: Partial<TResourcesAll>) => void;
 
   // --- METHODS ---
