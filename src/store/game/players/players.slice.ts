@@ -23,6 +23,8 @@ export const createPlayersSlice: TPlayersSliceCreator<IPlayersSlice> = (
     });
   },
 
+  setPlayers: (players) => set({ players }),
+
   setPlayerResources: (id, resources) => {
     set((state) => ({
       players: state.players.map((player) =>
