@@ -7,7 +7,8 @@ export interface IPlayersSlice {
   currentPlayerIndex: number;
 
   // --- GETTERS ---
-  getPlayerResources: () => TResourcesAll;
+  getCurrentPlayer: () => TPlayer;
+  getPlayer: (id: number) => TPlayer;
 
   // --- SETTERS ---
   setNextPlayer: () => void;

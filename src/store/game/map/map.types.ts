@@ -1,10 +1,13 @@
 import { StateCreator } from "zustand";
-import { TFieldID, TMap } from "@/shared/types/map.type";
+import { TField, TFieldID, TMap } from "@/shared/types/map.type";
 import { TBuilding } from "@/shared/types/building.type";
 
 export interface IMapSlice {
   map: TMap;
   memorizedFieldId: TFieldID | null;
+
+  // --- GETTERS ---
+  getFieldById: (fieldId: TFieldID) => TField | undefined;
 
   // --- SETTERS ---
   setFieldBuilding: (fieldId: TFieldID, building: TBuilding) => void;
@@ -23,6 +26,11 @@ export interface IMapSlice {
   enableField: (fieldId: TFieldID) => void;
 
   unsetFieldOwner: (fieldId: TFieldID) => void;
+
+  // --- ACTIONS ---
+  collect: (fieldID: TFieldID) => void;
+  grabWorker: () => void;
+  placeWorker: (fieldID: TFieldID) => void;
 }
 
 export type TMapSliceCreator<T extends object> = StateCreator<

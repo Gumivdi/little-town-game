@@ -8,10 +8,12 @@ export const createPlayersSlice: TPlayersSliceCreator<IPlayersSlice> = (
   players: [],
 
   // --- GETTERS ---
-  getPlayerResources: () => {
+  getCurrentPlayer: () => {
     const { players, currentPlayerIndex } = get();
-    return players[currentPlayerIndex].resources;
+    return players[currentPlayerIndex];
   },
+
+  getPlayer: (id) => get().players[id - 1],
 
   // --- SETTERS ---
   setNextPlayer: () => {
