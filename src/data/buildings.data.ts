@@ -24,10 +24,12 @@ export const DSpecialBuildings = [
   EBuildings.WATCHTOWER,
 ];
 
+export const DAdvancedUsageBuildings = [EBuildings.LOMBARD];
+
 export const DWithoutBenefitBuildings = [EBuildings.STATUE];
 
 export const DBuildings: TBuilding[] = [
-   {
+  {
     name: EBuildings.WHEAT_FIELD,
     quantity: 5,
     point: 3,
@@ -224,8 +226,8 @@ export const DBuildings: TBuilding[] = [
     },
     action: {
       require: {},
-      benefit: {}
-    }
+      benefit: {},
+    },
   },
 
   {

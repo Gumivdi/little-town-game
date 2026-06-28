@@ -3,11 +3,21 @@ import { updateMapField } from "@/shared/helpers/map/update-map-field";
 import { updateMapFields } from "@/shared/helpers/map/update-map-fields";
 import { getCollectableFieldIds } from "@/shared/helpers/map/get-collectable-field-ids";
 import { isWorkerOnField } from "@/shared/helpers/map/is-worker-on-field";
-import { IMapSlice, TMapSliceCreator } from "./map.types";
+import { TMapSliceCreator } from "./map.types";
+import { createCollectAction } from "../../actions/map/collect";
+import { TGameStore } from "..";
+import { createGrabWorkerAction } from "@/store/actions/map/grab-worker";
+import { createPlaceWorkerAction } from "@/store/actions/map/place-worker";
 
-export const createMapSlice: TMapSliceCreator<IMapSlice> = (set) => ({
+export const createMapSlice: TMapSliceCreator<TGameStore> = (set, get) => ({
   map: [],
   memorizedFieldId: null,
+
+  // --- GETTERS ---
+  getFieldById: (fieldId) =>
+    get()
+      .map.flat()
+      .find((field) => field.id === fieldId),
 
   // --- SETTERS ---
   setFieldBuilding: (fieldId, building) =>
@@ -90,4 +100,9 @@ export const createMapSlice: TMapSliceCreator<IMapSlice> = (set) => ({
       })),
     }));
   },
+
+  // --- ACTIONS ---
+  collect: createCollectAction({ set, get }),
+  grabWorker: createGrabWorkerAction({ set, get }),
+  placeWorker: createPlaceWorkerAction({ set, get }),
 });
