@@ -1,11 +1,11 @@
 import { create } from "zustand";
 import { TGameStore } from "../..";
-import { createFlowSlice } from "../../flow";
-import { createMapSlice } from "../../map";
-import { createMarketSlice } from "../../market";
-import { createPlayersSlice } from "../../players";
-import { createSupplySlice } from "../../supply";
-import { createToastSlice } from "../../toast";
+import { createFlowSlice } from "../../slices/flow";
+import { createMapSlice } from "../../slices/map";
+import { createMarketSlice } from "../../slices/market";
+import { createPlayersSlice } from "../../slices/players";
+import { createSupplySlice } from "../../slices/supply";
+import { createToastSlice } from "../../slices/toast";
 
 export const createGameTestStore = () =>
   create<TGameStore>()((...a) => ({
