@@ -1,9 +1,9 @@
 import { expect, it } from "vitest";
 import { ROCKS } from "@/data/fields.data";
 import { DBuildings } from "@/data/buildings.data";
-import { TBuildArea } from "@/shared/types/map.type";
-import { createBuildArea } from "./setup/create-build-area";
 import { createGameTestStore } from "../../setup/create-game-test-store";
+import { assertBuildArea } from "./helpers/assert-build-area";
+import { createBuildArea } from "./setup/create-build-area";
 
 it("clearOwnersOnEmptyGrass()", () => {
   const store = createGameTestStore();
@@ -23,6 +23,15 @@ it("clearOwnersOnEmptyGrass()", () => {
 
   store.getState().clearOwnersOnEmptyGrass();
 
-  expect((store.getState().map[0][1] as TBuildArea).owner).toBeNull();
-  expect((store.getState().map[0][2] as TBuildArea).owner).toBe(1);
+  const state = store.getState();
+
+  const expectations = [
+    { field: state.map[0][1], expectedOwner: null },
+    { field: state.map[0][2], expectedOwner: 1 },
+  ];
+
+  expectations.forEach(({ field, expectedOwner }) => {
+    const buildArea = assertBuildArea(field);
+    expect(buildArea.owner).toBe(expectedOwner);
+  });
 });

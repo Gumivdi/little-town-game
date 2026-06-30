@@ -6,22 +6,24 @@ import { createGameTestStore } from "@/store/game/tests/setup/create-game-test-s
 it("grabWorker()", () => {
   const store = createGameTestStore();
 
-  store.getState().setMap([
-    [
-      createBuildArea({
-        id: "0-0-1-3",
-        disabled: true,
-      }),
-      createBuildArea({
-        id: "0-1-1-3",
-        disabled: true,
-      }),
-      createBuildArea({
-        id: "0-2-1-3",
-        disabled: true,
-      }),
+  store.setState({
+    map: [
+      [
+        createBuildArea({
+          id: "0-0-1-3",
+          disabled: true,
+        }),
+        createBuildArea({
+          id: "0-1-1-3",
+          disabled: true,
+        }),
+        createBuildArea({
+          id: "0-2-1-3",
+          disabled: true,
+        }),
+      ],
     ],
-  ]);
+  });
 
   store.getState().grabWorker();
 

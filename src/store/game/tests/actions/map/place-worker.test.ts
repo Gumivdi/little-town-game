@@ -7,48 +7,51 @@ import { getBuilding } from "@/shared/helpers/buildings/get-building";
 import { createGameTestStore } from "@/store/game/tests/setup/create-game-test-store";
 import { TMap } from "@/shared/types/map.type";
 
+const generateMap = (): TMap => [
+  [
+    createBuildArea({ id: "0-0-3-3" }),
+    createBuildArea({
+      id: "0-1-3-3",
+      owner: 1,
+      building: getBuilding(EBuildings.QUARRY),
+    }),
+    createBuildArea({
+      id: "0-2-3-3",
+      owner: 2,
+      building: getBuilding(EBuildings.STATUE),
+    }),
+  ],
+  [
+    { ...FORREST, id: "1-0-3-3" },
+    createBuildArea({ id: "1-1-3-3" }),
+    { ...ROCKS, id: "1-2-3-3" },
+  ],
+  [
+    createBuildArea({
+      id: "2-0-3-3  ",
+      owner: 1,
+      building: getBuilding(EBuildings.CASTLE),
+    }),
+    createBuildArea({ id: "2-1-3-3", owner: 2 }),
+    { ...POND, id: "2-2-3-3" },
+  ],
+];
+
+const generatePlayers = () =>
+  DPlayers.map((player) => ({
+    ...player,
+    workers: 3,
+  }));
+
 it("placeWorker()", () => {
   const store = createGameTestStore();
   const selectedFieldId = "1-1-3-3";
 
-  const generatePlayers = () =>
-    DPlayers.map((player) => ({
-      ...player,
-      workers: 3,
-    }));
+  store.setState({
+    map: generateMap(),
+    players: generatePlayers(),
+  });
 
-  const generateMap = (): TMap => [
-    [
-      createBuildArea({ id: "0-0-3-3" }),
-      createBuildArea({
-        id: "0-1-3-3",
-        owner: 1,
-        building: getBuilding(EBuildings.QUARRY),
-      }),
-      createBuildArea({
-        id: "0-2-3-3",
-        owner: 2,
-        building: getBuilding(EBuildings.STATUE),
-      }),
-    ],
-    [
-      { ...FORREST, id: "1-0-3-3" },
-      createBuildArea({ id: "1-1-3-3" }),
-      { ...ROCKS, id: "1-2-3-3" },
-    ],
-    [
-      createBuildArea({
-        id: "2-0-3-3  ",
-        owner: 1,
-        building: getBuilding(EBuildings.CASTLE),
-      }),
-      createBuildArea({ id: "2-1-3-3", owner: 2 }),
-      { ...POND, id: "2-2-3-3" },
-    ],
-  ];
-
-  store.getState().setPlayers(generatePlayers());
-  store.getState().setMap(generateMap());
   store.getState().placeWorker(selectedFieldId);
 
   const state = store.getState();

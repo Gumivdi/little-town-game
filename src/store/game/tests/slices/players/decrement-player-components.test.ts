@@ -11,8 +11,8 @@ describe("decreasePlayerComponents()", () => {
     });
 
     store.getState().decrementPlayerBuildings();
-    const { players, currentPlayerIndex } = store.getState();
 
+    const { players, currentPlayerIndex } = store.getState();
     expect(players[currentPlayerIndex]).toBeDefined();
     expect(players[currentPlayerIndex]?.buildings).toBe(-1);
   });
@@ -25,8 +25,8 @@ describe("decreasePlayerComponents()", () => {
     });
 
     store.getState().decrementPlayerWorkers();
-    const { players, currentPlayerIndex } = store.getState();
 
+    const { players, currentPlayerIndex } = store.getState();
     expect(players[currentPlayerIndex]).toBeDefined();
     expect(players[currentPlayerIndex]?.workers).toBe(-1);
   });

@@ -9,46 +9,49 @@ import { ERequestStatus } from "@/shared/enums/requestStatus.enum";
 import { createGameTestStore } from "@/store/game/tests/setup/create-game-test-store";
 import { isBuildArea } from "@/store/game/slices/map/map.guards";
 
-describe("collect()", () => {
-  const generateMap: () => TMap = () => [
-    [
-      createBuildArea({ id: "0-0-3-3", disabled: true }),
-      createBuildArea({
-        id: "0-1-3-3",
-        owner: 1,
-        building: getBuilding(EBuildings.QUARRY),
-        disabled: false,
-      }),
-      createBuildArea({
-        id: "0-2-3-3",
-        owner: 2,
-        building: getBuilding(EBuildings.STATUE),
-        disabled: true,
-      }),
-    ],
-    [
-      { ...FORREST, id: "1-0-3-3", disabled: false },
-      createBuildArea({ id: "1-1-3-3", disabled: true }),
-      { ...ROCKS, id: "1-2-3-3", disabled: false },
-    ],
-    [
-      createBuildArea({
-        id: "2-0-3-3",
-        owner: 2,
-        building: getBuilding(EBuildings.WHEAT_FIELD),
-        disabled: false,
-      }),
-      createBuildArea({ id: "2-1-3-3", owner: 2, disabled: true }),
-      { ...POND, id: "2-2-3-3", disabled: false },
-    ],
-  ];
+const generateMap: () => TMap = () => [
+  [
+    createBuildArea({ id: "0-0-3-3", disabled: true }),
+    createBuildArea({
+      id: "0-1-3-3",
+      owner: 1,
+      building: getBuilding(EBuildings.QUARRY),
+      disabled: false,
+    }),
+    createBuildArea({
+      id: "0-2-3-3",
+      owner: 2,
+      building: getBuilding(EBuildings.STATUE),
+      disabled: true,
+    }),
+  ],
+  [
+    { ...FORREST, id: "1-0-3-3", disabled: false },
+    createBuildArea({ id: "1-1-3-3", disabled: true }),
+    { ...ROCKS, id: "1-2-3-3", disabled: false },
+  ],
+  [
+    createBuildArea({
+      id: "2-0-3-3",
+      owner: 2,
+      building: getBuilding(EBuildings.WHEAT_FIELD),
+      disabled: false,
+    }),
+    createBuildArea({ id: "2-1-3-3", owner: 2, disabled: true }),
+    { ...POND, id: "2-2-3-3", disabled: false },
+  ],
+];
 
+describe("collect()", () => {
   it("Collect a resource", () => {
     const store = createGameTestStore();
     const fieldId = "1-0-3-3";
 
-    store.getState().setPlayers(DPlayers);
-    store.getState().setMap(generateMap());
+    store.setState({
+      map: generateMap(),
+      players: DPlayers,
+    });
+
     store.getState().collect(fieldId);
 
     const state = store.getState();
@@ -62,9 +65,15 @@ describe("collect()", () => {
     const store = createGameTestStore();
     const fieldId = "1-0-3-3";
 
-    store.getState().setPlayers(DPlayers);
-    store.getState().setMap(generateMap());
-    store.getState().removeFromSupply({ wood: 15 });
+    store.setState({
+      map: generateMap(),
+      players: DPlayers,
+      supplies: {
+        ...store.getState().supplies,
+        wood: 0,
+      },
+    });
+
     store.getState().collect(fieldId);
 
     const state = store.getState();
@@ -78,11 +87,15 @@ describe("collect()", () => {
     const store = createGameTestStore();
     const fieldId = "0-1-3-3";
 
-    store.getState().setPlayers(DPlayers);
-    store.getState().setMap(generateMap());
-    store
-      .getState()
-      .setPlayerResources(store.getState().getCurrentPlayer().id, { coin: 3 });
+    store.setState({
+      map: generateMap(),
+      players: DPlayers.map((player, index) =>
+        index === 0
+          ? { ...player, resources: { ...player.resources, coin: 3 } }
+          : player,
+      ),
+    });
+
     store.getState().collect(fieldId);
 
     const state = store.getState();
@@ -96,14 +109,16 @@ describe("collect()", () => {
     const store = createGameTestStore();
     const fieldId = "0-1-3-3";
 
-    store.getState().setPlayers(DPlayers);
-    store.getState().setMap(generateMap());
-    store
-      .getState()
-      .setPlayerResources(store.getState().getCurrentPlayer().id, {
-        coin: 3,
-      });
-    store.getState().removeFromSupply({ stone: 14 });
+    store.setState({
+      map: generateMap(),
+      players: DPlayers.map((player, index) =>
+        index === 0
+          ? { ...player, resources: { ...player.resources, coin: 3 } }
+          : player,
+      ),
+      supplies: { ...store.getState().supplies, stone: 1 },
+    });
+
     store.getState().collect(fieldId);
 
     const state = store.getState();
@@ -118,17 +133,20 @@ describe("collect()", () => {
     const store = createGameTestStore();
     const fieldId = "2-0-3-3";
 
-    store.getState().setPlayers(DPlayers);
-    store.getState().setMap(generateMap());
+    store.setState({
+      map: generateMap(),
+      players: DPlayers.map((player, index) =>
+        index === 0
+          ? { ...player, resources: { ...player.resources, coin: 1 } }
+          : player,
+      ),
+    });
 
     const field = store.getState().getFieldById(fieldId);
     if (!field || !isBuildArea(field) || field.owner === null) {
       throw new Error("Wrong field to test");
     }
 
-    store
-      .getState()
-      .setPlayerResources(store.getState().getCurrentPlayer().id, { coin: 1 });
     store.getState().collect(fieldId);
 
     const state = store.getState();
@@ -144,8 +162,11 @@ describe("collect()", () => {
     const store = createGameTestStore();
     const fieldId = "2-0-3-3";
 
-    store.getState().setPlayers(DPlayers);
-    store.getState().setMap(generateMap());
+    store.setState({
+      map: generateMap(),
+      players: DPlayers,
+    });
+
     store.getState().collect(fieldId);
 
     const state = store.getState();
